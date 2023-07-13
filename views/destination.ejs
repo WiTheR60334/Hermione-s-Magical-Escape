@@ -1,0 +1,33 @@
+<%- include("partials/header"); -%>
+
+<section class="destination" id="destination" style="margin-top: 100px;">
+  <div class="heading">
+    <span>Destination Details</span>
+    <h1 style="font-size: 5rem;"><%= destination.title %></h1>
+  </div>
+
+  <div class="content" style="color: whitesmoke; font-size: 2rem;">
+    <p><%= destination.firstPara %></p>
+    <p><%= destination.content %></p>
+  </div>
+
+  <div class="images">
+    <img src="<%=destination.firstImg%>" class="firstImg" alt="<%=destination.title%>" />
+
+    <% destination.imagesURL.forEach(function(image){ %>
+      <img src="<%=image%>" alt="<%=destination.title%>" />
+    <% }); %>
+
+  </div>
+
+  <% if (user && user.role === 'admin') { %>
+    <div class="admin-buttons">
+      <a href="/alldestinations/<%= destination._id %>/edit" class="btn btn-primary">Edit Post</a>
+      <form action="/alldestinations/<%= destination._id %>delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+        <button type="submit" class="btn btn-danger">Delete Post</button>
+      </form>
+    </div>
+  <% } %>
+</section>
+
+<%- include("partials/footer"); -%>
