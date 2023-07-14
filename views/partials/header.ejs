@@ -59,6 +59,9 @@
             <% if (user && user.role === 'admin') { %>
             <a data-aos="zoom-in-left" data-aos-delay="300" href="/newdestination">New Destination</a>
             <% } %>
+            <% if (user && user.role === 'admin') { %>
+                <a data-aos="zoom-in-left" data-aos-delay="300" href="/newflight">New Flight</a>
+            <% } %>
             <% if(user) { %>
             <a href="/logout" class="fas fa-sign-out-alt">Logout</a>
            <% } %>

@@ -1,0 +1,20 @@
+<%- include("partials/header"); -%>
+
+<section class="container" style="font-size: 2rem; color:white; margin-top : 100px;">
+  <h1 style="font-size: 4rem; margin-bottom:30px;">All Scheduled Flights</h1>
+  <div class="flight-container">
+    <% allFlights.forEach(function(flight) { %>
+      <div class="flight-card">
+        <h2><%= flight.departure %> to <%= flight.arrival %></h2>
+
+        <% flight.schedule.forEach(function(schedule) { %>
+        <p>Available Seats: <%= schedule.availableSeats %></p>
+        <% }); %>
+        
+        <a href="/allflights/<%= flight._id %>">Read More</a>
+      </div>
+    <% }); %>
+  </div>
+</section>
+
+<%- include("partials/footer"); -%>

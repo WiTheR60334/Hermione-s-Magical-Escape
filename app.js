@@ -120,6 +120,104 @@ const usersSchema = new mongoose.Schema({
   }
   ));
   
+
+  // Define the schedule schema
+const scheduleSchema = new mongoose.Schema({
+    departureDate: {
+      type: Date,
+      required: true,
+    },
+    departureTime: {
+      type: String,
+      required: true,
+    },
+    arrivalDate: {
+      type: Date,
+      required: true,
+    },
+    arrivalTime: {
+      type: String,
+      required: true,
+    },
+    availableSeats: {
+      type: Number,
+      required: true,
+    },
+  });
+  
+  // Define the flight schema
+  const flightSchema = new mongoose.Schema({
+    flightID: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    departure: {
+      type: String,
+      required: true,
+    },
+    arrival: {
+      type: String,
+      required: true,
+    },
+    maxCapacity: {
+      type: Number,
+      required: true,
+    },
+    currentStatus: {
+      type: String,
+      enum: ['Available', 'Sold Out'],
+      default: 'Available',
+    },
+    schedule: [scheduleSchema], // Embed the schedule schema
+  });
+  
+  // Create the Flight model
+  const Flight = mongoose.model('Flight', flightSchema);
+  
+  // Example code to create and store flight information
+  const flight1 = new Flight({
+    flightID: 'FL001',
+    departure: 'London',
+    arrival: 'Hogwarts Castle',
+    maxCapacity: 100,
+    schedule: [
+      {
+        departureDate: new Date('2023-07-15'),
+        departureTime: '10:00 AM',
+        arrivalDate: new Date('2023-07-15'),
+        arrivalTime: '12:00 PM',
+        availableSeats: 100,
+      },
+    ],
+  });
+  
+  const flight2 = new Flight({
+    flightID: 'FL002',
+    departure: 'Paris',
+    arrival: 'Diagon Valley',
+    maxCapacity: 150,
+    schedule: [
+      {
+        departureDate: new Date('2023-07-16'),
+        departureTime: '11:00 AM',
+        arrivalDate: new Date('2023-07-16'),
+        arrivalTime: '2:00 PM',
+        availableSeats: 150,
+      },
+    ],
+  });
+  
+  // Save the flights to the database
+//   flight1.save()
+//     .then(() => console.log('Flight 1 saved successfully'))
+//     .catch((err) => console.error('Error saving Flight 1:', err));
+  
+//   flight2.save()
+//     .then(() => console.log('Flight 2 saved successfully'))
+//     .catch((err) => console.error('Error saving Flight 2:', err));
+
+
   
   app.get("/auth/google",
     passport.authenticate("google", { scope: ["profile"] })
@@ -242,6 +340,42 @@ app.get("/signup.html", function(req, res) {
     }
   });
 
+
+//Route for checking all flights schedule.
+
+app.get('/allflights', function(req, res) {
+    Flight.find({})
+      .exec()
+      .then((allFlights) => {
+        res.render('allflights', { allFlights: allFlights, user : req.user });
+      })
+      .catch((err) => {
+        console.error('Error retrieving flights:', err);
+        res.redirect('/');
+      });
+  });
+  
+  app.get('/allflights/:flightId', function(req, res) {
+    const flightId = req.params.flightId;
+  
+    Flight.findById(flightId)
+      .exec()
+      .then((flight) => {
+        if (flight) {
+          res.render('flight', { flight: flight, user : req.user });
+        } else {
+          console.log('Flight not found');
+          res.redirect('/allflights');
+        }
+      })
+      .catch((err) => {
+        console.error('Error retrieving flight:', err);
+        res.redirect('/allflights');
+      });
+  });
+  
+  
+
 app.get("/alldestinations",function(req,res){
     Destination.find({})
     .exec()
@@ -318,6 +452,137 @@ app.get("/search/:title", function(req, res) {
     const searchQuery = req.body.searchTerm;
     res.redirect("/search/"+searchQuery);
   });
+
+
+app.get("/newflight",function(req,res){
+    res.render("newflight",{user : req.user});
+});  
+
+
+// Route for adding a new flight (admin only)
+app.post("/newflight", isAuthenticated, function(req, res) {
+    const flightID = req.body.flightID;
+    const departure = req.body.departure;
+    const arrival = req.body.arrival;
+    const maxCapacity = req.body.maxCapacity;
+    const departureDate = req.body.departureDate;
+    const departureTime = req.body.departureTime;
+    const arrivalDate = req.body.arrivalDate;
+    const arrivalTime = req.body.arrivalTime;
+    const availableSeats = req.body.availableSeats;
+  
+    // Create a new flight object
+    const newFlight = new Flight({
+      flightID: flightID,
+      departure: departure,
+      arrival: arrival,
+      maxCapacity: maxCapacity,
+      schedule: [
+        {
+          departureDate: departureDate,
+          departureTime: departureTime,
+          arrivalDate: arrivalDate,
+          arrivalTime: arrivalTime,
+          availableSeats: availableSeats,
+        },
+      ],
+    });
+  
+    // Save the new flight to the database
+    newFlight.save()
+      .then(() => {
+        console.log("New flight added successfully");
+        res.redirect("/allflights");
+      })
+      .catch((err) => {
+        console.error("Error adding new flight:", err);
+        res.redirect("/allflights");
+      });
+  });
+    
+
+
+
+app.get("/allflights/:flightID/edit", isAuthenticated, function(req, res) {
+  const flightID = req.params.flightID;
+
+  Flight.findOne({ _id: flightID })
+    .exec()
+    .then((foundFlight) => {
+      if (foundFlight) {
+        res.render("editflight", { foundFlight: foundFlight, user: req.user });
+      } else {
+        console.log("Flight not found");
+        res.redirect("/");
+      }
+    })
+    .catch((err) => {
+      console.log(`Error Occurred: ${err}`);
+      res.redirect("/");
+    });
+});
+
+app.post("/allflights/:flightID/edit", isAuthenticated, function (req, res) {
+    const flightID = req.params.flightID;
+    const updatedDeparture = req.body.departure;
+    const updatedArrival = req.body.arrival;
+    const updatedMaxCapacity = req.body.maxCapacity; // Updated this line
+    const updatedDepartureDate = req.body.departureDate;
+    const updatedDepartureTime = req.body.departureTime;
+    const updatedArrivalDate = req.body.arrivalDate;
+    const updatedArrivalTime = req.body.arrivalTime;
+    const updatedAvailableSeats = req.body.availableSeats;
+  
+    const update = {
+      departure: updatedDeparture,
+      arrival: updatedArrival,
+      maxCapacity: updatedMaxCapacity,
+      schedule: [
+        {
+      departureDate: updatedDepartureDate,
+      departureTime : updatedDepartureTime,
+      arrivalDate : updatedArrivalDate,
+      arrivalTime :  updatedArrivalTime,
+      availableSeats : parseInt(updatedAvailableSeats)
+        },
+    ]
+    };
+  
+    Flight.findByIdAndUpdate(flightID, update, { new: true })
+      .then((updatedFlight) => {
+        if (updatedFlight) {
+          res.redirect(`/allflights/${flightID}`);
+        } else {
+          console.log("Flight not found");
+          res.redirect("/");
+        }
+      })
+      .catch((err) => {
+        console.log(`Error Occurred: ${err}`);
+        res.redirect("/");
+      });
+  });
+
+
+// Delete Post
+app.post("/allflights/:flightID/delete", isAuthenticated, function(req, res) {
+  const flightID = req.params.flightID;
+
+  Flight.findByIdAndRemove(flightID)
+    .then(() => {
+      res.redirect("/");
+    })
+    .catch((err) => {
+      console.log(`Error Occurred: ${err}`);
+      res.redirect("/");
+    });
+});
+
+
+
+
+
+
 
 app.get("/alldestinations/:destinationId/edit", isAuthenticated, function(req, res) {
   const destinationID = req.params.destinationId;

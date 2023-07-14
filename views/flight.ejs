@@ -1,0 +1,26 @@
+<%- include("partials/header"); -%>
+
+<section class="container" style="font-size: 20px; color:white; margin-top : 100px;">
+  <h1 style="font-size: 4rem; margin-bottom:30px;">Details of the Flight</h1>
+  <h2 style="font-size: 30px; margin-bottom:20px;">Flight from <%= flight.departure %> to <%= flight.arrival %></h2>
+  <% flight.schedule.forEach(function(schedule) { %>
+    <p>Departure Date: <%= schedule.departureDate.toDateString() %></p>
+    <p>Departure Time: <%= schedule.departureTime %></p>
+    <p>Arrival Date: <%= schedule.arrivalDate.toDateString() %></p>
+    <p>Arrival Time: <%= schedule.arrivalTime %></p>
+    <p>Available Seats: <%= schedule.availableSeats %></p>
+  <% }); %>
+  <p>Flight ID : <%= flight.flightID %></p>
+  <a href="/allflights" style="margin-top: 50px;">Back to All Flights</a>
+
+  <% if (user && user.role === 'admin') { %>
+    <div class="admin-buttons">
+      <a href="/allflights/<%= flight._id %>/edit" class="btn btn-primary">Edit Flight</a>
+      <form action="/allflights/<%= flight._id %>delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+        <button type="submit" class="btn btn-danger">Cancel Flight</button>
+      </form>
+    </div>
+  <% } %>
+</section>
+
+<%- include("partials/footer"); -%>
