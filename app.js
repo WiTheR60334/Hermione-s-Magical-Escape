@@ -582,8 +582,6 @@ app.post("/allflights/:flightID/delete", isAuthenticated, function(req, res) {
 
 
 
-
-
 app.get("/alldestinations/:destinationId/edit", isAuthenticated, function(req, res) {
   const destinationID = req.params.destinationId;
 
