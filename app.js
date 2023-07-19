@@ -9,6 +9,9 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const nodemailer = require("nodemailer");
 const passportLocalMongoose = require("passport-local-mongoose");
 const session = require("express-session");
+const { ObjectId } = require('mongoose').Types;
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 const app = express();
 
@@ -67,7 +70,24 @@ const usersSchema = new mongoose.Schema({
       ref: 'Post'
     }],
     googleId: String,
-    googleDisplayName: String
+    googleDisplayName: String,
+    bookedFlights: [{
+      flight: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Flight',
+      },
+      name: String,
+      mobile: String,
+      passportNumber: String,
+      email: String,
+      departure: String,
+      arrival: String,
+      departureDate: Date,
+    }],
+    transactions: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Transaction',
+    }],
   });
   
   usersSchema.plugin(passportLocalMongoose);
@@ -174,6 +194,31 @@ const scheduleSchema = new mongoose.Schema({
   
   // Create the Flight model
   const Flight = mongoose.model('Flight', flightSchema);
+
+  const transactionSchema = new mongoose.Schema({
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    flight: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Flight',
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+  });
+  
+  // Create the Transaction model
+  const Transaction = mongoose.model('Transaction', transactionSchema);
+  
   
   // Example code to create and store flight information
   const flight1 = new Flight({
@@ -270,7 +315,8 @@ app.get("/signup.html", function(req, res) {
   
   // User Sign In
   app.get("/login", function(req, res) {
-    res.render("login", { user:req.user });
+    const message="";
+    res.render("login",{message : message, user : req.user});
   });
   
   app.post("/login", function(req, res) {
@@ -284,12 +330,29 @@ app.get("/signup.html", function(req, res) {
         console.log(err);
         res.redirect("/login");
       } else {
-        passport.authenticate("local")(req, res, function() {
-          res.redirect("/");
-        });
+        passport.authenticate("local", function(err, user, info) {
+          if (err) {
+            console.log(err);
+            res.redirect("/login");
+          } else if (!user) {
+            const message = "Invalid Credentials";
+            res.render("login", { message: message, user : req.user });
+          } else {
+            req.logIn(user, function(err) {
+              if (err) {
+                console.log(err);
+                res.redirect("/login");
+              } else {
+                const message = "";
+                res.redirect("/");
+              }
+            });
+          }
+        })(req, res);
       }
     });
   });
+  
   
   // User Authentication Middleware
   function isAuthenticated(req, res, next) {
@@ -579,6 +642,108 @@ app.post("/allflights/:flightID/delete", isAuthenticated, function(req, res) {
 });
 
 
+// app.post("/allflights/search", async function(req, res) {
+//   try {
+//     const departure = req.body.departure;
+//     const arrival = req.body.arrival;
+//     const departureDate = req.body.departureDate;
+//     const adults = parseInt(req.body.adults);
+//     const children = parseInt(req.body.children);
+//     const totalPassengers = adults + children;
+//     const returnDate = req.body.returnDate;
+//     const tripType = req.body.tripType;
+
+//     var count = req.body.count;
+//     var newDepartureArray = [];
+//     var newArrivalArray = [];
+//     var newDepartureDateArray = [];
+//     var moreFlightsArray = [];
+//     for (var i = 0; i < count; i++) {
+//       const newDepartureDate = req.body[`newDepartureDate${i}`];
+//       const newArrival = req.body[`newArrival${i}`];
+//       const newDeparture = req.body[`newDeparture${i}`];
+
+//       newDepartureArray.push(newDeparture);
+//       newDepartureDateArray.push(newDepartureDate);
+//       newArrivalArray.push(newArrival);
+//     }
+
+//     const firstFlight = await Flight.findOne({ departure: departure, arrival: arrival, departureDate: departureDate });
+
+//     const moreFlightsPromises = [];
+//     for (let i = 0; i < count; i++) {
+//       const moreFlightPromise = Flight.findOne({ departure: newDepartureArray[i], arrival: newArrivalArray[i], departureDate: newDepartureDateArray[i] });
+//       moreFlightsPromises.push(moreFlightPromise);
+//     }
+
+//     const moreFlights = await Promise.all(moreFlightsPromises);
+
+//     const departureToArrivalFlights = await Flight.find({
+//       departure: departure,
+//       arrival: arrival,
+//       "schedule.departureDate": departureDate,
+//       "schedule.availableSeats": { $gte: totalPassengers }
+//     });
+
+//     const returnFlights = await Flight.find({
+//       departure: arrival,
+//       arrival: departure,
+//       "schedule.departureDate": returnDate,
+//       "schedule.availableSeats": { $gte: totalPassengers }
+//     });
+
+//     res.render("flightsearch", {
+//       departureToArrivalFlights: departureToArrivalFlights,
+//       returnFlights: returnFlights,
+//       moreFlights: moreFlights,
+//       user: req.user,
+//       firstFlight: firstFlight
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.redirect("/");
+//   }
+// });
+
+
+
+
+app.post("/allflights/search", async function(req, res) {
+  try {
+    const departure = req.body.departure;
+    const arrival = req.body.arrival;
+    const departureDate = req.body.departureDate;
+    const adults = parseInt(req.body.adults);
+    const children = parseInt(req.body.children);
+    const totalPassengers = adults + children;
+    const returnDate = req.body.returnDate;
+
+    const departureToArrivalFlights = await Flight.find({
+      departure: departure,
+      arrival: arrival,
+      "schedule.departureDate": departureDate,
+      "schedule.availableSeats": { $gte: totalPassengers }
+    });
+
+    const returnFlights = await Flight.find({
+      departure: arrival,
+      arrival: departure,
+      "schedule.departureDate": returnDate,
+      "schedule.availableSeats": { $gte: totalPassengers }
+    });
+
+    res.render("flightsearch", {
+      departureToArrivalFlights: departureToArrivalFlights,
+      returnFlights: returnFlights,
+      user: req.user
+    });
+  } catch (err) {
+    console.log(err);
+    res.redirect("/");
+  }
+});
+
+
 
 
 
@@ -676,6 +841,105 @@ app.post("/alldestinations/:destinationId/delete-image", isAuthenticated, functi
         res.redirect("/");
       });
   });
+
+
+  app.get("/allflights/:flightId/bookflight", isAuthenticated, async function(req, res) {
+    try {
+      const flightId = req.params.flightId;
+      const flight = await Flight.findById(flightId);
+  
+      res.render("bookflight", { flightId: flightId, user: req.user, availableSeats: flight.schedule[0].availableSeats });
+    } catch (err) {
+      console.log(err);
+      res.redirect("/allflights");
+    }
+  });
+  
+  app.post("/allflights/:flightId/bookflight", isAuthenticated, async function(req, res) {
+    try {
+      const flightId = req.params.flightId;
+      const { Name, mobile, passportNumber, email } = req.body;
+  
+      const flight = await Flight.findById(flightId);
+  
+      if (flight.schedule[0].availableSeats > 0) {
+        const booking = {
+          flight: flight._id,
+          departure: flight.departure,
+          arrival: flight.arrival,
+          departureDate: flight.schedule[0].departureDate,
+          name: Name,
+          mobile: mobile,
+          passportNumber: passportNumber,
+          email: email,
+        };
+  
+        await User.findByIdAndUpdate(req.user._id, { $push: { bookedFlights: booking } });
+        flight.schedule[0].availableSeats -= 1;
+        await flight.save();
+  
+        console.log("Flight booked successfully");
+
+       // Generate PDF ticket
+      const doc = new PDFDocument();
+      const ticketPath = `ticket for ${booking.departure+" to "+booking.arrival}.pdf`;
+      const stream = fs.createWriteStream(ticketPath);
+
+      doc.pipe(stream);
+      doc.fontSize(12).text(`Name: ${booking.name}`);
+      doc.fontSize(12).text(`Passport Number: ${booking.passportNumber}`);
+      doc.fontSize(12).text(`Mobile Number: ${booking.mobile}`);
+      doc.fontSize(12).text(`Email Address: ${booking.email}`);
+      doc.end();
+
+      // Set the ticketPath in the bookedFlight object
+      booking.ticketPath = ticketPath;
+      await User.findOneAndUpdate(
+        { _id: req.user._id, "bookedFlights.flight": booking.flight },
+        { $set: { "bookedFlights.$.ticketPath": ticketPath } }
+      );
+
+      // Trigger the download of the PDF ticket
+      res.setHeader('Content-disposition', `attachment; filename=${ticketPath}`);
+      res.setHeader('Content-type', 'application/pdf');
+      fs.createReadStream(ticketPath).pipe(res);
+
+      } else {
+        console.log("No available seats for the selected flight");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    res.redirect("/allflights/" + req.params.flightId);
+  });
+  
+  //Route for cancelling the booked flight.
+
+app.post("/allflights/:flightId/cancelbooking/:bookingId", isAuthenticated, async function(req, res) {
+  try {
+    const flightId = req.params.flightId;
+    const bookingId = req.params.bookingId;
+
+    const flight = await Flight.findById(flightId);
+    // Remove the booking from the user's bookedFlights array
+    await User.findByIdAndUpdate(req.user._id, { $pull: { bookedFlights: { _id: bookingId } } });
+
+    // Increase the available seats for the canceled flight
+
+        flight.schedule[0].availableSeats += 1;
+        await flight.save();
+
+
+    console.log("Flight canceled successfully");
+    
+    res.redirect(`/allflights/${flightId}`);
+  } catch (err) {
+    console.log(err);
+   
+    res.redirect(`/allflights`);
+  }
+});
+
 
 app.get("/about", function(req, res) {
     res.render("about", {user:req.user});

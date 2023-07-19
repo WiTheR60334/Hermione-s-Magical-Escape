@@ -1,0 +1,46 @@
+<!-- bookflight.ejs -->
+
+<%- include("partials/header"); -%>
+
+<section class="container" style="font-size: 2rem; color:white; margin-top: 100px;">
+  <h1 style="font-size: 4rem; margin-bottom:30px;">Enter Your Booking Details</h1>
+
+  <div class="form-container">
+    <form action="/allflights/<%= flightId %>/bookflight" method="POST">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="Name" placeholder="Enter your name" value="<%=user.name%>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="mobile">Mobile</label>
+        <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="passportNumber">Passport Number</label>
+        <input type="text" id="passportNumber" name="passportNumber" placeholder="Enter your passport number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email address" value="<%=user.username%>" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <% if (user && user.role === 'user' && user.bookedFlights.some(booking => booking.flight.toString() === flightId)) { %>
+        <% user.bookedFlights.forEach(function(bookedFlight){ %>
+          <% if (bookedFlight.flight.toString() === flightId) { %>
+            <% if (bookedFlight.ticketPath) { %>
+              <a href="<%= bookedFlight.ticketPath %>" download class="btn btn-primary">Download Ticket</a>
+            <% } %>
+          <% } %>
+        <% }); %>
+      <% } %>
+
+  </div>
+</section>
+
+<%- include("partials/footer"); -%>

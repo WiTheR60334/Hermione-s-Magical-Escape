@@ -9,18 +9,48 @@
     <p>Arrival Date: <%= schedule.arrivalDate.toDateString() %></p>
     <p>Arrival Time: <%= schedule.arrivalTime %></p>
     <p>Available Seats: <%= schedule.availableSeats %></p>
-  <% }); %>
-  <p>Flight ID : <%= flight.flightID %></p>
+    <p>Flight ID : <%= flight.flightID %></p>
   <a href="/allflights" style="margin-top: 50px;">Back to All Flights</a>
+    <% if (user && user.role === 'user' && !user.bookedFlights.some(booking => booking.flight.toString() === flight._id.toString() && booking.departureDate.toString() === schedule.departureDate.toString())) { %>
+      <form action="/allflights/<%= flight._id %>/bookflight" method="get">
+        <input type="hidden" name="scheduleId" value="<%= schedule._id %>">
+        <button type="submit" class="btn btn-primary">Book Now</button>
+      </form>
+    <% } %>
+    <% if (user && user.bookedFlights.some(booking => booking.flight.toString() === flight._id.toString() && booking.departureDate.toString() === schedule.departureDate.toString())) { %>
+      <% user.bookedFlights.forEach(function(bookedFlight){ %>
+        <% if (bookedFlight.flight.toString() === flight._id.toString() && bookedFlight.departureDate.toString() === schedule.departureDate.toString()) { %>
+          <form action="/allflights/<%= flight._id %>/cancelbooking/<%=bookedFlight._id%>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this flight?');">
+            <input type="hidden" name="scheduleId" value="<%= schedule._id %>">
+            <button type="submit" class="btn btn-danger">Cancel Flight</button>
+          </form>
+        <% } %>
+      <% }); %>
+    <% } %>
+
+    <% if (user && user.role === 'user' && user.bookedFlights.some(booking => booking.flight.toString() === flight._id.toString() && booking.departureDate.toString() === schedule.departureDate.toString())) { %>
+      <% user.bookedFlights.forEach(function(bookedFlight){ %>
+        <% if (bookedFlight.flight.toString() === flight._id.toString() && bookedFlight.departureDate.toString() === schedule.departureDate.toString()) { %>
+          <% if (bookedFlight.ticketPath) { %>
+            <a href="<%= bookedFlight.ticketPath %>" download class="btn btn-primary">Download Ticket</a>
+          <% } %>
+        <% } %>
+      <% }); %>
+    <% } %>      
+
+  <% }); %>
+  
 
   <% if (user && user.role === 'admin') { %>
     <div class="admin-buttons">
       <a href="/allflights/<%= flight._id %>/edit" class="btn btn-primary">Edit Flight</a>
-      <form action="/allflights/<%= flight._id %>delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+      <form action="/allflights/<%= flight._id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
         <button type="submit" class="btn btn-danger">Cancel Flight</button>
       </form>
     </div>
   <% } %>
+
+  
 </section>
 
 <%- include("partials/footer"); -%>
