@@ -1,0 +1,93 @@
+<%- include("partials/header"); -%>
+
+<section class="new-flight">
+  <div class="box-container">
+    <div class="box">
+  <h1>Add New Flight</h1>
+  <form action="/newflight" method="post">
+    <div class="form-group">
+      <label for="flightID">Flight ID</label>
+      <input type="text" class="form-control" id="flightID" name="flightID" required>
+    </div>
+    <div class="form-group">
+      <label for="departure">Departure</label>
+      <select name="departure" class="form-control" id="departure" required>
+        <option value="" disabled selected>Select a state</option>
+        <option value="Andhra Pradesh">Andhra Pradesh</option>
+        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+        <option value="Assam">Assam</option>
+        <option value="Bihar">Bihar</option>
+        <option value="Chhattisgarh">Chhattisgarh</option>
+        <option value="Goa">Goa</option>
+        <option value="Gujarat">Gujarat</option>
+        <option value="Haryana">Haryana</option>
+        <option value="Himachal Pradesh">Himachal Pradesh</option>
+        <option value="Jharkhand">Jharkhand</option>
+        <option value="Karnataka">Karnataka</option>
+        <option value="Kerala">Kerala</option>
+        <option value="Madhya Pradesh">Madhya Pradesh</option>
+        <option value="Maharashtra">Maharashtra</option>
+        <option value="Manipur">Manipur</option>
+        <option value="Meghalaya">Meghalaya</option>
+        <option value="Mizoram">Mizoram</option>
+        <option value="Nagaland">Nagaland</option>
+        <option value="Odisha">Odisha</option>
+        <option value="Punjab">Punjab</option>
+        <option value="Rajasthan">Rajasthan</option>
+        <option value="Sikkim">Sikkim</option>
+        <option value="Tamil Nadu">Tamil Nadu</option>
+        <option value="Telangana">Telangana</option>
+        <option value="Tripura">Tripura</option>
+        <option value="Uttar Pradesh">Uttar Pradesh</option>
+        <option value="Uttarakhand">Uttarakhand</option>
+        <option value="West Bengal">West Bengal</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="arrival">Arrival</label>
+      <select name="arrival" class="form-control" id="arrival" required>
+        <option value="" disabled selected>Select the place</option>
+        <option value="Hogwarts Castle">Hogwarts Castle</option>
+        <option value="Diagon Alley">Diagon Alley</option>
+        <option value="Hogsmeade Village">Hogsmeade Village</option>
+        <option value="The Forbidden Forest">The Forbidden Forest</option>
+        <option value="Ministry of Magic">Ministry of Magic</option>
+        <option value="Durmstrang Institute">Durmstrang Institute</option>
+        <option value="Beauxbatons Academy of Magic">Beauxbatons Academy of Magic</option>
+        <option value="Azkaban">Azkaban</option>
+    </select>
+    </div>
+    <div class="form-group">
+      <label for="maxCapacity">Max Capacity</label>
+      <input type="number" class="form-control" id="maxCapacity" name="maxCapacity" required>
+    </div>
+    <h3>Schedule</h3>
+    <div class="form-group">
+      <label for="departureDate">Departure Date</label>
+      <input type="date" class="form-control" id="departureDate" name="departureDate" required>
+    </div>
+    <div class="form-group">
+      <label for="departureTime">Departure Time</label>
+      <input type="time" class="form-control" id="departureTime" name="departureTime" required>
+    </div>
+    <div class="form-group">
+      <label for="arrivalDate">Arrival Date</label>
+      <input type="date" class="form-control" id="arrivalDate" name="arrivalDate" required>
+    </div>
+    <div class="form-group">
+      <label for="arrivalTime">Arrival Time</label>
+      <input type="time" class="form-control" id="arrivalTime" name="arrivalTime" required>
+    </div>
+    <div class="form-group">
+      <label for="availableSeats">Available Seats</label>
+      <input type="number" class="form-control" id="availableSeats" name="availableSeats" required>
+    </div>
+    <div class="tp">
+      <button type="submit" class="btn btn-primary">Add Flight</button>
+    </div>
+  </form>
+  </div>
+  </div>
+</section>
+
+<%- include("partials/footer"); -%>

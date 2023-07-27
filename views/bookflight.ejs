@@ -1,0 +1,40 @@
+<!-- bookflight.ejs -->
+
+<%- include("partials/header"); -%>
+
+<section class="book-hotel">
+  <div class="box-container">
+    <div class="box">
+        <h1 style="font-size: 4rem; margin-bottom:30px;">Enter Your Booking Details</h1>
+
+        <div class="form-container">
+          <form action="/allflights/<%= flightId %>/bookflight" method="POST">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" class="form-control" name="Name" placeholder="Enter your name" required>
+            </div>
+        
+            <div class="form-group">
+              <label for="mobile">Mobile</label>
+              <input type="tel" id="mobile" class="form-control" name="mobile" placeholder="Enter your mobile number" required>
+            </div>
+        
+            <div class="form-group">
+              <label for="passportNumber">Passport Number</label>
+              <input type="text" id="passportNumber" class="form-control" name="passportNumber" placeholder="Enter your passport number" required>
+            </div>
+        
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" class="form-control" name="email" placeholder="Enter your email address" required>
+            </div>
+        
+            <div class="tp">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+    </div>
+</section>
+
+<%- include("partials/footer"); -%>
