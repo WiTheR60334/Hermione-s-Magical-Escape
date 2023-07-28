@@ -1614,7 +1614,7 @@ background: var(--bordercolor);
 
 .pricing .box-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(40rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(34rem, 1fr));
   gap: 1.5rem;
   margin: 2rem;
 
