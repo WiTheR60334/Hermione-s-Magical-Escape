@@ -2120,8 +2120,12 @@ background: var(--bordercolor);
   }
 }
 
+.container3 .admin-buttons2{
+  margin-top: -.8rem;
+}
+
 .container3 a{
-  font-size: 2rem;
+    font-size: 2rem;
   color: var(--bordercolor);
 
   @media (max-width:768px) {
@@ -2131,6 +2135,12 @@ background: var(--bordercolor);
 
 .container3 a:hover i{
   padding-right: 1rem;
+}
+
+#download-ticket{
+  display: flex;
+  font-size: 1.8rem;
+  padding: 1rem 2.5rem;
 }
 
 .container3 .admin-buttons{
@@ -2154,6 +2164,121 @@ background: var(--bordercolor);
   }
 }
 /*Flight Details ends*/
+
+
+/*Flight Payment starts*/
+.payment{
+  align-items: center;
+  justify-content: center;
+  margin-top: 10rem;
+}
+
+.payment .box-container{
+  width: 40%;
+  margin: 1rem auto;
+  background: var(--bgcolor2);
+  position: relative;
+  z-index: 1;
+  border-radius: 2rem;
+  padding: 3rem 2rem;
+  color: var(--textcolor1);
+
+  @media (max-width:768px) {
+    width: 80%;
+  }
+}
+
+.payment h1{
+  font-size: 3.5rem;
+  margin: 1rem auto;
+  color: var(--textcolor1);
+  margin-bottom: 4rem;
+  padding: 1rem;
+  background: var(--bgcolor1);
+  border-radius: 1rem;
+  width: 70%;
+
+  @media (max-width:768px) {
+    font-size: 2.5rem;
+    width: 90%;
+  }
+}
+
+.payment .box{
+  text-align: center;
+  line-height: 4rem;
+}
+
+.payment span{
+  color: var(--bordercolor);
+  font-weight: bolder;
+}
+
+.payment h2{
+  font-size: 2.5rem;
+  margin-bottom: 5rem;
+
+  @media (max-width:768px) {
+    font-size: 1.9rem;
+  }
+}
+
+.payment .tp{
+  margin-bottom: 2rem;
+}
+
+.payment p{
+  font-size: 1.8rem;
+  margin-top: .8rem;
+
+  @media (max-width:768px) {
+    font-size: 1.6rem;
+  }
+}
+
+#first{
+  margin-top: -2rem;
+}
+
+#last{
+  margin-top: 2rem;
+  font-size: 2rem;
+}
+
+.payment a{
+  font-size: 2rem;
+  color: var(--bordercolor);
+
+  @media (max-width:768px) {
+    font-size: 1.8rem;
+  }
+}
+
+.payment a:hover i{
+  padding-right: 1rem;
+}
+
+.payment .admin-buttons{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: -1rem;
+}
+
+@media (max-width: 768px) {
+  .admin-buttons {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .admin-buttons a,
+  .admin-buttons button{
+    margin-top: 4rem;
+    font-size: 1.5rem;
+    padding: 1.2rem 1.8rem;
+  }
+}
+/*Flight Payment Details ends*/
 
 
 /*Edit Flight starts*/

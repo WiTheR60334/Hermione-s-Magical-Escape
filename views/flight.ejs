@@ -26,19 +26,19 @@
             </form>
           <% } %>
         </div>
-        <div class="tp">
           <% if (user && user.role === 'user' && user.bookedFlights.some(booking => booking.flight.toString() === flight._id.toString() && booking.departureDate.toString() === schedule.departureDate.toString())) { %>
             <% user.bookedFlights.forEach(function(bookedFlight){ %>
               <% if (bookedFlight.flight.toString() === flight._id.toString() && bookedFlight.departureDate.toString() === schedule.departureDate.toString()) { %>
-                <a href="/allflights/<%= flight._id %>/download-ticket/<%= bookedFlight._id %>" download class="btn btn-primary">Download Ticket</a>
+                <div class="admin-buttons2">
+                <a href="/allflights/<%= flight._id %>/download-ticket/<%= bookedFlight._id %>" download class="btn btn-primary" id="download-ticket">Download Ticket</a>
                 <form action="/allflights/<%= flight._id %>/cancelbooking/<%=bookedFlight._id%>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this flight?');">
                   <input type="hidden" name="scheduleId" value="<%= schedule._id %>">
                   <button type="submit" class="btn btn-danger">Cancel Flight</button>
                 </form>
+              </div>
               <% } %>
             <% }); %>
           <% } %>
-        </div>
         <a href="/allflights"><i class="fas fa-angle-left"></i>Back to All Flights</a>     
       <% }); %>
 
