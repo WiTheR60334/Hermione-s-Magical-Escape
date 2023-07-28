@@ -93,7 +93,7 @@
       <% user.bookedHotels.forEach(function(bookedHotel) { %>
         <% if (bookedHotel.hotel.toString() === hotel._id.toString()) { %>
           <% if (bookedHotel.ticketPath) { %>
-            <a href="<%= bookedHotel.ticketPath %>" download class="btn btn-primary">Download Ticket</a>
+            <a href="/allhotels/<%= hotel._id %>/download-ticket/<%= bookedHotel._id %>" download class="btn btn-primary">Download Ticket</a>
           <% } %>
           <form action="/allhotels/<%= hotel._id %>/cancelbooking/<%=bookedHotel._id%>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
             <button type="submit" class="btn btn-danger">Cancel Booking</button>
