@@ -28,7 +28,7 @@
     </div>
   </div>
 
-  <div class="content3">
+  <div class="content3" data-aos="fade-up" data-aos-delay="300">
     <div class="price"><span class="line">₹ 10499</span> ₹ <%=hotel.pricePerNight%> <span class="night">/night </span></div>
     <% if(!user) { %>
       <a href="/login" class="btn btn-primary">Book Now</a>
@@ -89,7 +89,7 @@
     </div>
     </div>
 
-    <div class="admin-buttons2">
+    <div class="admin-buttons2" data-aos="fade-up" data-aos-delay="300">
       <% user.bookedHotels.forEach(function(bookedHotel) { %>
         <% if (bookedHotel.hotel.toString() === hotel._id.toString()) { %>
           <% if (bookedHotel.ticketPath) { %>
