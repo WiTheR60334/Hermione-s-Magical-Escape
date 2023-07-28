@@ -21,6 +21,10 @@
           <label for="maxCapacity">Max Capacity</label>
           <input type="number" class="form-control" id="maxCapacity" name="maxCapacity" value="<%=foundFlight.maxCapacity%>" required>
         </div>
+        <div class="form-group">
+          <label for="updatedPrice">Flight Price</label>
+          <input type="number" class="form-control" id="updatedPrice" name="updatedPrice" value="<%=foundFlight.price%>" required>
+        </div>
         <h3>Schedule</h3>
         <% foundFlight.schedule.forEach(function(schedule) { %>
           <div class="form-group">

@@ -11,7 +11,7 @@
           <form action="/allflights/<%= flightId %>/bookflight" method="POST">
             <div class="form-group">
               <label for="name">Name</label>
-              <input type="text" id="name" class="form-control" name="Name" placeholder="Enter your name" required>
+              <input type="text" id="name" class="form-control" name="Name" placeholder="Enter your name" value="<%=user.name%>" required>
             </div>
         
             <div class="form-group">
@@ -26,7 +26,7 @@
         
             <div class="form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" class="form-control" name="email" placeholder="Enter your email address" required>
+              <input type="email" id="email" class="form-control" name="email" placeholder="Enter your email address" value="<%=user.username%>" required>
             </div>
         
             <div class="tp">

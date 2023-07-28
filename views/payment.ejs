@@ -1,0 +1,21 @@
+<%- include("partials/header"); -%>
+
+<!-- Add the following code to payment.ejs -->
+<section class="payment" style="margin-top: 120px; color : white; font-size : 2rem; text-align : center;">
+    <h2>Payment Details</h2>
+    <p><strong>Name:</strong> <%= booking.name %></p>
+    <p><strong>Mobile:</strong> <%= booking.mobile %></p>
+    <p><strong>Passport Number:</strong> <%= booking.passportNumber %></p>
+    <p><strong>Email:</strong> <%= booking.email %></p>
+    <p><strong>Flight Price:</strong> <%= booking.price %>$</p>
+    <p>Confirm your booking by making the payment here</p>
+
+    <form action="/allflights/<%= flightId %>/bookflight/paypal" method="post">
+        <!-- Add any additional fields for different payment options -->
+        <!-- For PayPal -->
+        <input type="hidden" name="paymentMethod" value="paypal">
+        <button type="submit" class="btn btn-primary">Pay with PayPal</button>
+    </form>
+</section>
+
+<%- include("partials/header"); -%>

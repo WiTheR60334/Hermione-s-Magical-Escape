@@ -147,7 +147,7 @@
     <% allFlights.forEach(function(flight) { %>
       <div class="flight-card">
         <h2><%= flight.departure %> to <%= flight.arrival %></h2>
-
+        <p><span>Flight Pice :</span> <%= flight.price %>$</p>
         <% flight.schedule.forEach(function(schedule) { %>
         <p>Available Seats: <%= schedule.availableSeats %></p>
         <% }); %>

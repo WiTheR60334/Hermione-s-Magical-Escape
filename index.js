@@ -13,6 +13,8 @@ const { ObjectId } = require('mongoose').Types;
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const cron = require("node-cron");
+const paypal = require("paypal-rest-sdk");
+const flash = require("connect-flash");
 // const { PDFDocument, StandardFonts } = require('pdf-lib');
 
 const app = express();
@@ -27,11 +29,13 @@ app.use(session({
     resave: false,
     saveUninitialized: false
   }));
+  app.use(flash());
   
   app.use(passport.initialize());
   app.use(passport.session());
 
 mongoose.connect("mongodb+srv://adminharrypotter:"+process.env.PASSWORD+"@cluster2.d4dgox6.mongodb.net/destinationsDB", { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 const destinationSchema = new mongoose.Schema({
     title: String,
@@ -89,6 +93,7 @@ const usersSchema = new mongoose.Schema({
       departure: String,
       arrival: String,
       departureDate: Date,
+      ticketPath : String
     }],
     bookedHotels: [{
       hotel: {
@@ -203,6 +208,10 @@ const scheduleSchema = new mongoose.Schema({
       required: true,
     },
     maxCapacity: {
+      type: Number,
+      required: true,
+    },
+    price: {
       type: Number,
       required: true,
     },
@@ -322,6 +331,7 @@ const scheduleSchema = new mongoose.Schema({
     departure: 'London',
     arrival: 'Hogwarts Castle',
     maxCapacity: 100,
+    price : 50,
     schedule: [
       {
         departureDate: new Date('2023-07-15'),
@@ -338,6 +348,7 @@ const scheduleSchema = new mongoose.Schema({
     departure: 'Paris',
     arrival: 'Diagon Valley',
     maxCapacity: 150,
+    price : 75,
     schedule: [
       {
         departureDate: new Date('2023-07-16'),
@@ -386,6 +397,7 @@ const deleteOutdatedFlights = async () => {
   }
 };
 
+
 // Schedule the deleteOutdatedFlights function to run daily at midnight (00:00)
 cron.schedule('0 0 * * *', deleteOutdatedFlights);
 
@@ -430,21 +442,37 @@ app.get("/signup.html", function(req, res) {
     res.render("signup", { user: req.user });
 });  
   
-  app.post("/signup", function(req, res) {
-    const { name, username, password } = req.body;
-    const newUser = new User({ name, username });
-  
-    User.register(newUser, password, function(err, user) {
-      if (err) {
-        console.log(err);
-        res.redirect("/signup");
+app.post("/signup", function (req, res) {
+  const { name, username, password } = req.body;
+
+  // Check if a user with the provided username already exists
+  User.findOne({ username: username })
+    .then((existingUser) => {
+      if (existingUser) {
+        // User already exists, redirect to login page with a message
+        res.render("login", {message : "User already Exists", user : req.user});
       } else {
-        passport.authenticate("local")(req, res, function() {
-          res.redirect("/");
-        });
+        // Create a new user
+        const newUser = new User({ name, username });
+
+        User.register(newUser, password)
+          .then((user) => {
+            passport.authenticate("local")(req, res, function () {
+              res.redirect("/");
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            res.redirect("/signup");
+          });
       }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.redirect("/signup");
     });
-  });
+});
+
   
   // User Sign In
   app.get("/login", function(req, res) {
@@ -683,6 +711,7 @@ app.post("/newflight", isAuthenticated, function(req, res) {
     const arrivalDate = req.body.arrivalDate;
     const arrivalTime = req.body.arrivalTime;
     const availableSeats = req.body.availableSeats;
+    const price = req.body.price;
   
     // Create a new flight object
     const newFlight = new Flight({
@@ -690,6 +719,7 @@ app.post("/newflight", isAuthenticated, function(req, res) {
       departure: departure,
       arrival: arrival,
       maxCapacity: maxCapacity,
+      price : price,
       schedule: [
         {
           departureDate: departureDate,
@@ -745,11 +775,13 @@ app.post("/allflights/:flightID/edit", isAuthenticated, function (req, res) {
     const updatedArrivalDate = req.body.arrivalDate;
     const updatedArrivalTime = req.body.arrivalTime;
     const updatedAvailableSeats = req.body.availableSeats;
+    const updatedPrice = req.body.updatedPrice;
   
     const update = {
       departure: updatedDeparture,
       arrival: updatedArrival,
       maxCapacity: updatedMaxCapacity,
+      price : updatedPrice,
       schedule: [
         {
       departureDate: updatedDepartureDate,
@@ -993,7 +1025,12 @@ app.post("/alldestinations/:destinationId/delete-image", isAuthenticated, functi
   });
 
 
-  app.get("/allflights/:flightId/bookflight", isAuthenticated, async function(req, res) {
+//Payment Route through Paypal
+
+
+// Route for handling the successful PayPal payment
+
+app.get("/allflights/:flightId/bookflight", isAuthenticated, async function(req, res) {
     try {
       const flightId = req.params.flightId;
       const flight = await Flight.findById(flightId);
@@ -1003,67 +1040,213 @@ app.post("/alldestinations/:destinationId/delete-image", isAuthenticated, functi
       console.log(err);
       res.redirect("/allflights");
     }
-  });
+});
   
-  app.post("/allflights/:flightId/bookflight", isAuthenticated, async function(req, res) {
-    try {
-      const flightId = req.params.flightId;
-      const { Name, mobile, passportNumber, email } = req.body;
-  
-      const flight = await Flight.findById(flightId);
-  
-      if (flight.schedule[0].availableSeats > 0) {
-        const booking = {
-          flight: flight._id,
-          departure: flight.departure,
-          arrival: flight.arrival,
-          departureDate: flight.schedule[0].departureDate,
-          name: Name,
-          mobile: mobile,
-          passportNumber: passportNumber,
-          email: email,
-        };
-  
-        await User.findByIdAndUpdate(req.user._id, { $push: { bookedFlights: booking } });
-        flight.schedule[0].availableSeats -= 1;
-        await flight.save();
-  
-        console.log("Flight booked successfully");
+app.post("/allflights/:flightId/bookflight", isAuthenticated, async function (req, res) {
+  try {
+    const flightId = req.params.flightId;
+    const flight = await Flight.findById(flightId);
 
-       // Generate PDF ticket
+    if (flight.schedule[0].availableSeats > 0) {
+      const booking = {
+        flight: flight._id,
+        departure: flight.departure,
+        arrival: flight.arrival,
+        departureDate: flight.schedule[0].departureDate,
+        price : flight.price,
+        name: req.body.Name,
+        mobile: req.body.mobile,
+        passportNumber: req.body.passportNumber,
+        email: req.body.email,
+      };
+
+      // Store booking data in the session
+      req.session.bookingData = booking;
+      res.render("payment", { flightId: flightId, user: req.user, booking, flight : flight });
+    } else {
+      console.log("No available seats for the selected flight");
+    }
+  } catch (err) {
+    console.log(err);
+    res.redirect("/allflights");
+  }
+});
+
+
+// Route for handling the payment method selection and initiating the PayPal payment
+app.post("/allflights/:flightId/bookflight/paypal", isAuthenticated, async function (req, res) {
+  try {
+    const flightId = req.params.flightId;
+    const paymentMethod = req.body.paymentMethod;
+
+    // Fetch booking data from the session
+    const booking = req.session.bookingData;
+    if (!booking) {
+      console.log("Booking data not found in the session");
+      res.redirect(`/allflights/${flightId}`);
+      return;
+    }
+
+    const flight = await Flight.findById(flightId);
+    if (!flight) {
+      console.log("Flight not found in the database");
+      res.redirect(`/allflights/${flightId}`);
+      return;
+    }
+
+    if (paymentMethod === "paypal") {
+      // Implement the PayPal payment process
+      // For this example, we will use the 'paypal-rest-sdk' package
+      const paypal = require("paypal-rest-sdk");
+
+      // Replace these with your PayPal credentials
+      const clientId = process.env.PAYPAL_CLIENT_ID;
+      const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+      console.log(clientId);
+      console.log(clientSecret);
+
+      paypal.configure({
+        mode: "sandbox", // sandbox or live
+        client_id: clientId,
+        client_secret: clientSecret,
+      });
+
+      // Set up the payment details
+      const createPaymentJson = {
+        intent: "sale",
+        payer: {
+          payment_method: "paypal",
+        },
+        redirect_urls: {
+          return_url: `http://localhost:3000/allflights/${flightId}/bookflight/paypal/success`,
+          cancel_url: `http://localhost:3000/allflights/${flightId}/bookflight/paypal/cancel`,
+        },
+        transactions: [
+          {
+            item_list: {
+              items: [
+                {
+                  name: "Flight Booking",
+                  sku: "flight",
+                  price: flight.price, // Replace with the actual price of the flight
+                  currency: "USD",
+                  quantity: 1,
+                },
+              ],
+            },
+            amount: {
+              currency: "USD",
+              total: flight.price, // Replace with the actual total price of the flight
+            },
+            description: "Flight booking payment",
+          },
+        ],
+      };
+
+      // Create the PayPal payment
+      paypal.payment.create(createPaymentJson, function (error, payment) {
+        if (error) {
+          console.log("Error creating PayPal payment:", error);
+          res.redirect(`/allflights/${flightId}`);
+        } else {
+          // Save the payment ID in the booking data for later use
+          booking.paypalPaymentId = payment.id;
+          req.session.bookingData = booking;
+
+          // Redirect the user to PayPal for payment approval
+          for (let i = 0; i < payment.links.length; i++) {
+            if (payment.links[i].rel === "approval_url") {
+              res.redirect(payment.links[i].href);
+              break;
+            }
+          }
+        }
+      });
+    } else {
+      // Handle other payment methods here (credit/debit cards, UPI, Net Banking, etc.)
+      // You will need to implement the corresponding payment gateway's logic here
+      // and then redirect the user to the appropriate payment page
+      console.log("No other payment method available");
+      res.redirect("/allflights/:flightId/bookflight/failure");
+    }
+  } catch (err) {
+    console.log(err);
+    res.redirect("/allflights");
+  }
+});
+  
+//Payment Success route:
+
+app.get("/allflights/:flightId/bookflight/paypal/success", isAuthenticated, async function (req, res) {
+  try {
+    const flightId = req.params.flightId;
+    const flight = await Flight.findById(flightId);
+    const booking = req.session.bookingData;
+
+    console.log("Payment was successful!");
+    if (flight.schedule[0].availableSeats > 0) {
+      const newbooking = {
+        flight: flight._id,
+        departure: flight.departure,
+        arrival: flight.arrival,
+        departureDate: flight.schedule[0].departureDate,
+        name: booking.name,
+        mobile: booking.mobile,
+        passportNumber: booking.passportNumber,
+        email: booking.email,
+      };
+
+      await User.findByIdAndUpdate(req.user._id, { $push: { bookedFlights: newbooking } });
+      flight.schedule[0].availableSeats -= 1;
+      await flight.save();
+
+      console.log("Flight booked successfully");
+
+      // Generate PDF ticket
       const doc = new PDFDocument();
-      const ticketPath = `ticket for ${booking.departure+" to "+booking.arrival}.pdf`;
+      const ticketPath = `ticket for ${newbooking.departure + " to " + newbooking.arrival}.pdf`;
       const stream = fs.createWriteStream(ticketPath);
 
       doc.pipe(stream);
-      doc.fontSize(12).text(`Name: ${booking.name}`);
-      doc.fontSize(12).text(`${booking.departure} to ${booking.arrival}`);
-      doc.fontSize(12).text(`Passport Number: ${booking.passportNumber}`);
-      doc.fontSize(12).text(`Mobile Number: ${booking.mobile}`);
-      doc.fontSize(12).text(`Email Address: ${booking.email}`);
+      doc.fontSize(12).text(`Name: ${newbooking.name}`);
+      doc.fontSize(12).text(`${newbooking.departure} to ${newbooking.arrival}`);
+      doc.fontSize(12).text(`Passport Number: ${newbooking.passportNumber}`);
+      doc.fontSize(12).text(`Mobile Number: ${newbooking.mobile}`);
+      doc.fontSize(12).text(`Email Address: ${newbooking.email}`);
       doc.end();
 
       // Set the ticketPath in the bookedFlight object
-      booking.ticketPath = ticketPath;
+      newbooking.ticketPath = ticketPath;
       await User.findOneAndUpdate(
-        { _id: req.user._id, "bookedFlights.flight": booking.flight },
+        { _id: req.user._id, "bookedFlights.flight": newbooking.flight },
         { $set: { "bookedFlights.$.ticketPath": ticketPath } }
       );
-
+      
       // Trigger the download of the PDF ticket
-      res.setHeader('Content-disposition', `attachment; filename=${ticketPath}`);
-      res.setHeader('Content-type', 'application/pdf');
+      res.setHeader("Content-disposition", `attachment; filename=${ticketPath}`);
+      res.setHeader("Content-type", "application/pdf");
       fs.createReadStream(ticketPath).pipe(res);
 
-      } else {
-        console.log("No available seats for the selected flight");
-      }
-    } catch (err) {
-      console.log(err);
+      // Clear the booking data from the session
+      req.session.bookingData = null;
+
+    } else {
+      console.log("No available seats for the selected flight");
     }
-    res.redirect("/allflights/" + req.params.flightId);
-  });
-  
+  } catch (err) {
+    console.log(err);
+  }
+  res.redirect("/allflights/" + req.params.flightId);
+});
+
+
+app.get("/allflights/:flightId/bookflight/paypal/failure", function(req,res){
+  console.log("Payment has failed because of error");
+  const flightId = req.params.flightId;
+  res.redirect(`/allflights/${flightId}`);
+});
+
+
   //Route for cancelling the booked flight.
 
 app.post("/allflights/:flightId/cancelbooking/:bookingId", isAuthenticated, async function(req, res) {
@@ -1091,6 +1274,40 @@ app.post("/allflights/:flightId/cancelbooking/:bookingId", isAuthenticated, asyn
   }
 });
 
+//Route for downloading ticket of flight
+
+app.get("/allflights/:flightId/download-ticket/:bookingId", isAuthenticated, async function (req, res) {
+  try {
+    const flightId = req.params.flightId;
+    const bookingId = req.params.bookingId;
+
+    // Find the specific flight in the bookedFlights array using the bookingId
+    const bookedFlight = req.user.bookedFlights.find((flight) => flight._id.toString() === bookingId);
+    if (!bookedFlight) {
+      console.log("Booking not found");
+      res.redirect(`/allflights/${flightId}`);
+      return;
+    }
+
+    // Retrieve the ticketPath from the booking data
+    const ticketPath = bookedFlight.ticketPath;
+
+    if (!ticketPath) {
+      console.log("Ticket not found");
+      res.redirect(`/allflights/${flightId}`);
+      return;
+    }
+
+    // Trigger the download of the PDF ticket
+    res.setHeader("Content-disposition", `attachment; filename=${ticketPath}`);
+    res.setHeader("Content-type", "application/pdf");
+    fs.createReadStream(ticketPath).pipe(res);
+
+  } catch (err) {
+    console.log(err);
+    res.redirect(`/allflights`);
+  }
+});
 
 
 
@@ -1328,12 +1545,10 @@ app.get("/allhotels/:hotelId/bookhotel", isAuthenticated, async function(req, re
   }
 });
 
-var roomsNumber = 0;
 
 app.post("/allhotels/:hotelId/bookhotel", isAuthenticated, async function(req, res) {
   try {
     const hotelId = req.params.hotelId;
-    roomsNumber = 0;
     const { Name, mobile, checkInDate, checkOutDate, numberOfMembers, numberOfRooms, email } = req.body;
     const hotel = await Hotel.findById(hotelId);
 
@@ -1355,63 +1570,215 @@ app.post("/allhotels/:hotelId/bookhotel", isAuthenticated, async function(req, r
         amenities: hotel.amenities.join(", ")
       };
 
-      roomsNumber = numberOfRooms;
-      
-      await User.findByIdAndUpdate(req.user._id, { $push: { bookedHotels: booking } });
-      console.log(numberOfRooms);
-      hotel.availableRooms -= numberOfRooms;
-      await hotel.save();
 
-      console.log("Hotel booked successfully");
-
-     // Generate PDF ticket
-    const doc = new PDFDocument();
-    const ticketPath = `hotel booking for ${booking.customerName}.pdf`;
-    const stream = fs.createWriteStream(ticketPath);
-
-    doc.pipe(stream);
-    doc.fontSize(20).text("Hotel Booking Confirmation Ticket");
-    doc.fontSize(12).text(`Name: ${booking.customerName}`);
-    doc.fontSize(12).text(`Mobile Number: ${booking.mobile}`);
-    doc.fontSize(12).text(`Number of Members : ${booking.numberOfMembers}`);
-    doc.fontSize(12).text(`Number of Rooms Booked : ${numberOfRooms}`);
-    doc.fontSize(12).text(`Hotel Name: ${booking.hotelName}`);
-    doc.fontSize(12).text(`Check In Date : ${booking.checkInDate}`);
-    doc.fontSize(12).text(`Check Out Date : ${booking.checkOutDate}`);
-    doc.fontSize(12).text(`Hotel Location: ${booking.location}`);
-    doc.fontSize(12).text(`Hotel Price Per Night: ${booking.pricePerNight}`);
-    doc.fontSize(12).text(`Total Available Rooms: ${booking.availableRooms}`);
-    doc.fontSize(12).text(`Hotel Rating : ${booking.rating}`);
-    // Display amenities as an unordered list
-    doc.fontSize(12).text("Hotel Amenities:");
-    doc.list(booking.amenities.split(", "), {
-      bulletRadius: 2,
-      textIndent: 10,
-      bulletIndent: 5,
-      lineGap: 2
-    });
-    doc.fontSize(20).text("Thank You for choosing our hotel. Hope you have a great experience");
-    doc.end();
-
-    // Set the ticketPath in the bookedFlight object
-    booking.ticketPath = ticketPath;
-    await User.findOneAndUpdate(
-      { _id: req.user._id, "bookedHotels.hotel": booking.hotel },
-      { $set: { "bookedHotels.$.ticketPath": ticketPath } }
-    );
-
-    // Trigger the download of the PDF ticket
-    res.setHeader('Content-disposition', `attachment; filename=${ticketPath}`);
-    res.setHeader('Content-type', 'application/pdf');
-    fs.createReadStream(ticketPath).pipe(res);
+      req.session.bookingHotel = booking;
+      res.render("payment_hotel",{hotelId: hotelId, user: req.user, booking, availableRooms: hotel.availableRooms});
 
     } else {
       console.log("No available rooms for the selected hotel");
     }
   } catch (err) {
     console.log(err);
+    res.redirect("/allhotels/" + req.params.hotelId);
   }
-  res.redirect("/allhotels/" + req.params.hotelId);
+});
+
+
+//Route for handling payment through Paypal
+
+app.post("/allhotels/:hotelId/bookhotel/paypal", isAuthenticated, async function (req, res) {
+  try {
+    const hotelId = req.params.hotelId;
+    const paymentMethod = req.body.paymentMethod;
+
+    // Fetch booking data from the session
+    const booking = req.session.bookingHotel;
+    if (!booking) {
+      console.log("Booking data not found in the session");
+      res.redirect(`/allhotels/${hotelId}`);
+      return;
+    }
+
+    // Fetch hotel details from the database using the hotelId
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+      console.log("Hotel not found in the database");
+      res.redirect(`/allhotels/${hotelId}`);
+      return;
+    }
+
+    if (paymentMethod === "paypal") {
+      // Implement the PayPal payment process
+      // For this example, we will use the 'paypal-rest-sdk' package
+      const paypal = require("paypal-rest-sdk");
+
+      // Replace these with your PayPal credentials
+      const clientId = process.env.PAYPAL_CLIENT_ID;
+      const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+      console.log(clientId);
+      console.log(clientSecret);
+
+      paypal.configure({
+        mode: "sandbox", // sandbox or live
+        client_id: clientId,
+        client_secret: clientSecret,
+      });
+
+      // Calculate the total amount for the booking based on hotel pricePerNight and number of occupiedRooms
+      const totalAmount = (parseFloat(hotel.pricePerNight) * parseInt(booking.occupiedRooms)).toFixed(2);
+
+      // Set up the payment details
+      const createPaymentJson = {
+        intent: "sale",
+        payer: {
+          payment_method: "paypal",
+        },
+        redirect_urls: {
+          return_url: `http://localhost:3000/allhotels/${hotelId}/bookhotel/paypal/success`,
+          cancel_url: `http://localhost:3000/allhotels/${hotelId}/bookhotel/paypal/cancel`,
+        },
+        transactions: [
+          {
+            item_list: {
+              items: [
+                {
+                  name: "Hotel Booking",
+                  sku: "hotel",
+                  price: totalAmount, // Replace with the actual price of the flight
+                  currency: "USD",
+                  quantity: 1,
+                },
+              ],
+            },
+            amount: {
+              currency: "USD",
+              total: totalAmount, // Replace with the actual total price of the flight
+            },
+            description: "Hotel booking payment",
+          },
+        ],
+      };
+
+      // Create the PayPal payment
+      paypal.payment.create(createPaymentJson, function (error, payment) {
+        if (error) {
+          console.log("Error creating PayPal payment for hotel:", error);
+          res.redirect(`/allhotels/${hotelId}`);
+        } else {
+          // Save the payment ID in the booking data for later use
+          booking.paypalPaymentId = payment.id;
+          req.session.bookingHotel = booking;
+
+          // Redirect the user to PayPal for payment approval
+          for (let i = 0; i < payment.links.length; i++) {
+            if (payment.links[i].rel === "approval_url") {
+              res.redirect(payment.links[i].href);
+              break;
+            }
+          }
+        }
+      });
+    } else {
+      // Handle other payment methods here (credit/debit cards, UPI, Net Banking, etc.)
+      // You will need to implement the corresponding payment gateway's logic here
+      // and then redirect the user to the appropriate payment page
+      console.log("No other payment method available");
+      res.redirect("/allhotels/:hotelId/bookhotel/failure");
+    }
+  } catch (err) {
+    console.log(err);
+    res.redirect("/allhotels");
+  }
+});
+
+
+app.get("/allhotels/:hotelId/bookhotel/paypal/success", isAuthenticated, async function(req,res){
+
+  const hotelId = req.params.hotelId;
+  const hotel = await Hotel.findById(hotelId);
+  const booking = req.session.bookingHotel;
+
+  if(hotel.availableRooms > 0){
+
+    const newbooking = {
+      customerName: booking.customerName,
+      mobile : booking.mobile,
+      email : booking.email,
+      numberOfMembers : booking.numberOfMembers,
+      occupiedRooms : booking.occupiedRooms,
+      checkInDate : booking.checkInDate,
+      checkOutDate : booking.checkOutDate,
+      hotel: hotel._id,
+      hotelName : hotel.name,
+      location: hotel.location,
+      rating: hotel.rating,
+      pricePerNight: hotel.pricePerNight,
+      availableRooms: hotel.availableRooms,
+      amenities: hotel.amenities.join(", ")
+    };
+
+    await User.findByIdAndUpdate(req.user._id, { $push: { bookedHotels: newbooking } });
+        console.log(booking.occupiedRooms);
+        hotel.availableRooms -= booking.occupiedRooms;
+        await hotel.save();
+  
+        console.log("Hotel booked successfully");
+  
+       // Generate PDF ticket
+      const doc = new PDFDocument();
+      const ticketPath = `hotel booking for ${newbooking.customerName}.pdf`;
+      const stream = fs.createWriteStream(ticketPath);
+  
+      doc.pipe(stream);
+      doc.fontSize(20).text("Hotel Booking Confirmation Ticket");
+      doc.fontSize(12).text(`Name: ${newbooking.customerName}`);
+      doc.fontSize(12).text(`Mobile Number: ${newbooking.mobile}`);
+      doc.fontSize(12).text(`Number of Members : ${newbooking.numberOfMembers}`);
+      doc.fontSize(12).text(`Number of Rooms Booked : ${newbooking.occupiedRooms}`);
+      doc.fontSize(12).text(`Hotel Name: ${newbooking.hotelName}`);
+      doc.fontSize(12).text(`Check In Date : ${newbooking.checkInDate}`);
+      doc.fontSize(12).text(`Check Out Date : ${newbooking.checkOutDate}`);
+      doc.fontSize(12).text(`Hotel Location: ${newbooking.location}`);
+      doc.fontSize(12).text(`Hotel Price Per Night: ${newbooking.pricePerNight}`);
+      doc.fontSize(12).text(`Total Available Rooms: ${newbooking.availableRooms}`);
+      doc.fontSize(12).text(`Hotel Rating : ${newbooking.rating}`);
+      // Display amenities as an unordered list
+      doc.fontSize(12).text("Hotel Amenities:");
+      doc.list(newbooking.amenities.split(", "), {
+        bulletRadius: 2,
+        textIndent: 10,
+        bulletIndent: 5,
+        lineGap: 2
+      });
+      doc.fontSize(20).text("Thank You for choosing our hotel. Hope you have a great experience");
+      doc.end();
+  
+      // Set the ticketPath in the bookedFlight object
+      newbooking.ticketPath = ticketPath;
+      await User.findOneAndUpdate(
+        { _id: req.user._id, "bookedHotels.hotel": newbooking.hotel },
+        { $set: { "bookedHotels.$.ticketPath": ticketPath } }
+      );
+  
+      // Trigger the download of the PDF ticket
+      res.setHeader('Content-disposition', `attachment; filename=${ticketPath}`);
+      res.setHeader('Content-type', 'application/pdf');
+      fs.createReadStream(ticketPath).pipe(res);
+
+      req.session.bookingHotel = null;
+      res.redirect(`/allhotels/${hotelId}`);
+  }
+  else{
+    console.log("No available rooms for the selected hotel");
+    res.redirect("/allhotels");
+  }
+});
+
+
+app.get("allhotels/:hotelId/bookhotel/paypal/failure", isAuthenticated, function(req,res){
+  const hotelId = req.params.hotelId;
+  console.log("Error to confirm payment for booking hotel");
+  res.redirect(`/allhotels/${hotelId}`);
 });
 
 //Route for cancelling the booked flight.
@@ -1445,7 +1812,38 @@ app.post("/allhotels/:hotelId/cancelbooking/:bookingId", isAuthenticated, async 
   }
 });
 
+app.get("/allhotels/:hotelId/download-ticket/:bookingId", isAuthenticated, async function (req, res) {
+  try {
+    const hotelId = req.params.hotelId;
+    const bookingId = req.params.bookingId;
 
+    // Find the specific hotel in the bookedHotels array using the bookingId
+    const bookedHotel = req.user.bookedHotels.find((hotel) => hotel._id.toString() === bookingId);
+    if (!bookedHotel) {
+      console.log("Booking not found");
+      res.redirect(`/allhotels/${hotelId}`);
+      return;
+    }
+
+    // Retrieve the ticketPath from the booking data
+    const ticketPath = bookedHotel.ticketPath;
+
+    if (!ticketPath) {
+      console.log("Ticket not found");
+      res.redirect(`/allhotels/${hotelId}`);
+      return;
+    }
+
+    // Trigger the download of the PDF ticket
+    res.setHeader("Content-disposition", `attachment; filename=${ticketPath}`);
+    res.setHeader("Content-type", "application/pdf");
+    fs.createReadStream(ticketPath).pipe(res);
+
+  } catch (err) {
+    console.log(err);
+    res.redirect(`/allhotels`);
+  }
+});
 
 
 
@@ -1496,15 +1894,12 @@ app.post("/contact", function(req, res) {
   });
 });
 
-// app.listen(3000, function() {
-//     console.log("Server started on port 3000");
-// });
+
+
 
 const port = process.env.PORT || 3000;
 
-// Listen on `port` and 0.0.0.0
 app.listen(port, "0.0.0.0", function () {
-  // ...
 });
 
 
