@@ -1600,7 +1600,7 @@ background: var(--bordercolor);
   text-align: center;
   justify-content: center;
   align-items: center;
-}
+} 
 
 .book-flight:hover,
 .login .share a:hover {
