@@ -1874,6 +1874,98 @@ app.get("/userprofile", isAuthenticated, async function (req, res) {
   }
 });
 
+// Route to handle IPN notifications
+app.post("/ipn-listener", async (req, res) => {
+  // Get the IPN message from the request body
+  const ipnMessage = req.body;
+
+  // Check if the IPN message is valid (you should implement your own validation logic)
+  const isValid = verifyIPN(ipnMessage);
+  if (!isValid) {
+    console.log("Invalid IPN message");
+    res.status(400).send("Invalid IPN message");
+    return;
+  }
+
+  // Process the payment and generate the receipt
+  try {
+    const paymentStatus = ipnMessage.payment_status;
+    const paymentAmount = ipnMessage.mc_gross; // The payment amount from the IPN message
+
+    if (paymentStatus === "Completed") {
+      // Payment is successful, generate receipt
+      const receipt = generateReceipt(ipnMessage);
+      const receiptPath = `receipt_${ipnMessage.txn_id}.pdf`;
+
+      // Save the receipt as a PDF
+      const doc = new PDFDocument();
+      doc.pipe(fs.createWriteStream(receiptPath));
+
+      doc.text(receipt, 100, 100); // Customize the receipt format as needed
+
+      doc.end();
+
+      // Send the receipt file in the response
+      res.setHeader("Content-disposition", `attachment; filename=${path.basename(receiptPath)}`);
+      res.setHeader("Content-type", "application/pdf");
+      fs.createReadStream(receiptPath).pipe(res);
+
+      // Delete the receipt file after sending it
+      fs.unlink(receiptPath, (err) => {
+        if (err) {
+          console.log("Error deleting receipt file:", err);
+        }
+      });
+    } else {
+      console.log("Payment not completed");
+      res.status(400).send("Payment not completed");
+    }
+  } catch (err) {
+    console.log("Error processing payment:", err);
+    res.status(500).send("Error processing payment");
+  }
+});
+
+// Helper function to verify IPN message (implement your own validation logic)
+// Helper function to verify IPN message
+function verifyIPN(ipnMessage) {
+
+  const verifyWebhookSignature = (transmissionId, transmissionTime, body, cb) => {
+    paypal.notification.webhookEvent.verify(transmissionId, transmissionTime, body, {
+      "client_id": process.env.PAYPAL_CLIENT_ID,
+      "client_secret": process.env.PAYPAL_CLIENT_SECRET
+    }, cb);
+  };
+
+  return new Promise((resolve, reject) => {
+    verifyWebhookSignature(ipnMessage.headers["paypal-transmission-id"], ipnMessage.headers["paypal-transmission-time"], ipnMessage.body, (error, response) => {
+      if (error) {
+        console.error("Error verifying IPN signature:", error);
+        resolve(false);
+      } else {
+        // The IPN message has been verified successfully
+        resolve(true);
+      }
+    });
+  });
+}
+
+// Helper function to generate receipt (customize the format as needed)
+function generateReceipt(ipnMessage) {
+  // Your receipt generation logic goes here
+  // Customize the format and content of the receipt based on the IPN message data
+  const receipt = `
+  Transaction ID: ${ipnMessage.txn_id}
+  Payment Amount: ${ipnMessage.mc_gross} ${ipnMessage.mc_currency}
+  Payment Status: ${ipnMessage.payment_status}
+  Payment Date: ${ipnMessage.payment_date}
+  Payer Email: ${ipnMessage.payer_email}
+
+  `;
+  return receipt;
+}
+
+
 app.get("/about", function(req, res) {
     res.render("about", {user:req.user});
 });
@@ -1919,6 +2011,10 @@ app.post("/contact", function(req, res) {
       res.redirect("/"); // Redirect to homepage after successful submission
     }
   });
+});
+
+app.listen(3000, function() {
+    console.log("Server started on port 3000");
 });
 
 
