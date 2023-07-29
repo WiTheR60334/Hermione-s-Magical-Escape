@@ -1,0 +1,194 @@
+<%- include("partials/header", {isHotelPage : false}); %>
+
+<section class="tp" style="margin-top: 120px;">
+    <h1>Welcome, <%= user.name %>!</h1>
+</section>
+  
+  <% if (user.bookedFlights && user.bookedFlights.length > 0) { %>
+    <section class="my-schedule">
+      <h2 style="color: white; font-size : 30px; text-align : center;">My Booked Flights</h2>
+      <% user.bookedFlights.forEach((flight, index) => { %>
+        <% const destination = flight.arrival; %>
+        <% const finalDestination = destinations.find(dest => dest.title === destination); %>
+        <% if (finalDestination) { %>
+          <div class="box">
+            <h3 style="color: white; font-size : 20px;">Trip <%= index + 1 %></h3>
+            <h3 style="color: white; font-size : 20px;"><%= flight.name %></h3>
+            <div class="box-container1">
+              <div class="box1" data-aos="fade-up" data-aos-delay="100">
+                <div class="image">
+                  <img src="<%= finalDestination.firstImg %>" alt="">
+                  <h3><i class="fas fa-map-marker-alt"></i><%= flight.arrival %></h3>
+                </div>
+                <div class="content">
+                  <div class="price">₹ 999 <span>1499</span></div>
+                  <p><%= finalDestination.firstPara %></p>
+                  <a href="/alldestinations/<%= finalDestination._id %>">Read More <i class="fas fa-angle-right"></i></a>
+                </div>
+              </div>
+              <section class="book-form" id="book-form">
+                <form action="">
+                  <div data-aos="zoom-in" data-aos-delay="150" class="inputBox">
+                    <span>From :</span>
+                    <input type="text" value="<%= flight.departure %>">
+                  </div>
+                  <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
+                    <span>To :</span>
+                    <input type="text" value="<%= flight.arrival %>">
+                  </div>
+                  <!-- <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
+                      <span>When ?</span>
+                      <input type="date" value="">
+                  </div> -->
+                  <div data-aos="zoom-in" data-aos-delay="450" class="inputBox">
+                    <span>Departure Date :</span>
+                    <input type="text" value="<%= flight.departureDate %>">
+                  </div>
+                  <!-- <input class="form-control user-success" id="starting-date" name="date" required="" type="date" value="2017-04-07" data-initialized="true" autofocus="autofocus">             -->
+                </form>
+              </section>
+              <section class="tp2">
+                <div class="wrapper">
+                  <header>
+                    <p class="current-date"></p>
+                    <div class="icons">
+                      <span id="prev" class="material-symbols-rounded">chevron_left</span>
+                      <span id="next" class="material-symbols-rounded">chevron_right</span>
+                    </div>
+                  </header>
+                  <div class="calendar">
+                    <ul class="weeks">
+                      <li>Sun</li>
+                      <li>Mon</li>
+                      <li>Tue</li>
+                      <li>Wed</li>
+                      <li>Thu</li>
+                      <li>Fri</li>
+                      <li>Sat</li>
+                    </ul>
+                    <ul class="days"></ul>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        <% } %>
+      <% }); %>
+    </section>
+  <% } %>
+
+  <% if (user.bookedHotels && user.bookedHotels.length > 0) { %>
+    <section class="my-schedule">
+      <h2 style="color: white; font-size : 20px; text-align : center;">My Booked Hotels</h2>
+      <% user.bookedHotels.forEach((hotel, index) => { %>
+        <% const foundHotel = hotels.find(h => h._id.toString() === hotel.hotel.toString()); %>
+        <% if (foundHotel) { %>
+          <div class="box">
+            <h3 style="color: white; font-size : 20px;">Trip <%= index + 1 %></h3>
+            <h3 style="color: white; font-size : 20px;"><%= hotel.hotelName %></h3>
+            <div class="box-container1">
+              <div class="box1" data-aos="fade-up" data-aos-delay="100">
+                <div class="image">
+                  <!-- Add hotel image if available -->
+                  <img src="<%= foundHotel.firstImg %>" alt="">
+                  <h3><i class="fas fa-map-marker-alt"></i><%= foundHotel.location %></h3>
+                </div>
+                <div class="content">
+                  <div class="price">₹ <%= foundHotel.pricePerNight %> <span><%= foundHotel.pricePerNight %></span></div>
+                  <!-- Add hotel description if available -->
+                  <p><%= foundHotel.firstPara %></p>
+                  <a href="/allhotels/<%= hotel.hotel %>">Read More <i class="fas fa-angle-right"></i></a>
+                </div>
+              </div>
+              <section class="book-form" id="book-form">
+                <form action="">
+                  <div data-aos="zoom-in" data-aos-delay="150" class="inputBox">
+                    <span>Check-in Date :</span>
+                    <input type="text" value="<%= hotel.checkInDate %>">
+                  </div>
+                  <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
+                    <span>Check-out Date :</span>
+                    <input type="text" value="<%= hotel.checkOutDate %>">
+                  </div>
+                  <div data-aos="zoom-in" data-aos-delay="450" class="inputBox">
+                    <span>Number of Members :</span>
+                    <input type="text" value="<%= hotel.numberOfMembers %>">
+                  </div>
+                  <div data-aos="zoom-in" data-aos-delay="600" class="inputBox">
+                    <span>Number of Rooms :</span>
+                    <input type="text" value="<%= hotel.occupiedRooms %>">
+                  </div>
+                </form>
+              </section>
+            </div>
+          </div>
+        <% } %>
+      <% }); %>
+    </section>
+  <% } %>
+
+  <% if (!user.bookedFlights.length && !user.bookedHotels.length) { %>
+    <p>No trips booked yet. Start booking your flights and hotels now!</p>
+  <% } %>
+
+
+<%- include("partials/footer"); %>
+
+
+<script>
+    const daysTag = document.querySelector(".days"),
+  currentDate = document.querySelector(".current-date"),
+  prevNextIcon = document.querySelectorAll(".icons span");
+  
+  // getting new date, current year and month
+  let date = new Date(),
+  currYear = date.getFullYear(),
+  currMonth = date.getMonth();
+  
+  // storing full name of all months in array
+  const months = ["January", "February", "March", "April", "May", "June", "July",
+                "August", "September", "October", "November", "December"];
+  
+  const renderCalendar = () => {
+      let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(), // getting first day of month
+      lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(), // getting last date of month
+      lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(), // getting last day of month
+      lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); // getting last date of previous month
+      let liTag = "";
+  
+      for (let i = firstDayofMonth; i > 0; i--) { // creating li of previous month last days
+          liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
+      }
+  
+      for (let i = 1; i <= lastDateofMonth; i++) { // creating li of all days of current month
+          // adding active class to li if the current day, month, and year matched
+          let isToday = i === date.getDate() && currMonth === new Date().getMonth() 
+                       && currYear === new Date().getFullYear() ? "active" : "";
+          liTag += `<li class="${isToday}">${i}</li>`;
+      }
+  
+      for (let i = lastDayofMonth; i < 6; i++) { // creating li of next month first days
+          liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`
+      }
+      currentDate.innerText = `${months[currMonth]} ${currYear}`; // passing current mon and yr as currentDate text
+      daysTag.innerHTML = liTag;
+  }
+  renderCalendar();
+  
+  prevNextIcon.forEach(icon => { // getting prev and next icons
+      icon.addEventListener("click", () => { // adding click event on both icons
+          // if clicked icon is previous icon then decrement current month by 1 else increment it by 1
+          currMonth = icon.id === "prev" ? currMonth - 1 : currMonth + 1;
+  
+          if(currMonth < 0 || currMonth > 11) { // if current month is less than 0 or greater than 11
+              // creating a new date of current year & month and pass it as date value
+              date = new Date(currYear, currMonth, new Date().getDate());
+              currYear = date.getFullYear(); // updating current year with new date year
+              currMonth = date.getMonth(); // updating current month with new date month
+          } else {
+              date = new Date(); // pass the current date as date value
+          }
+          renderCalendar(); // calling renderCalendar function
+      });
+  });  
+  </script>

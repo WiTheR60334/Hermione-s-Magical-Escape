@@ -1,13 +1,14 @@
 <%- include("partials/header", {isHotelPage : false}); -%>
-<section class="hotel" id="hotel" style="margin-top: 100px;">
-    <div class="heading">
-        <span>Our Hotel</span>
-        <h1>Make your Hotel</h1>
-    </div>
 
+<section class="hotel" id="hotel" style="margin-top: 120px;">
+    <div class="heading">
+        <span>Our Hotels</span>
+        <h1 class="text">Search Results : <%=message%></h1>
+    </div>
+    <% if (searchResults.length > 0) { %>
     <div class="box-container">
         <% let animationTime = 100; %>
-        <% hotels.forEach(function(hotel, index){ %>
+        <% searchResults.forEach(function(hotel, index){ %>
           <div class="box" data-aos="fade-up" data-aos-delay="<%= animationTime %>">
             <div class="image">
               <img src="<%= hotel.firstImg %>" alt="">
@@ -20,10 +21,12 @@
             </div>
           </div> 
           <% animationTime += 100; %>
-          <% if (index === hotels.length - 1) { %>
+          <% if (index === searchResults.length - 1) { %>
             <% animationTime = 100; %>
           <% } %>
         <% }); %>
       </div>
+      <% } %>
 </section>
+
 <%- include("partials/footer"); -%>

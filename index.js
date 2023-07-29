@@ -302,7 +302,7 @@ const scheduleSchema = new mongoose.Schema({
     },
     // Additional fields can be added based on your requirements
   });
-  
+    
   const Hotel = mongoose.model('Hotel', hotelsSchema);
 
   const hotel1 = new Hotel({
@@ -688,6 +688,13 @@ app.get("/search/:title", function(req, res) {
   });
   
   
+ //Logic to render empty search of destination
+ 
+ app.get("/search/", function(req,res){
+  res.render("search", { searchResults: [], user: req.user, message : "Nothing Found" });
+ });
+
+
   // POST route for form submission
   app.post("/search", function(req, res) {
     const searchQuery = req.body.searchTerm;
@@ -1379,7 +1386,7 @@ app.post("/newhotel",function(req,res){
 // GET route for searching
 app.get("/allhotels/search/:location", function(req, res) {
   const searchedLocation = req.params.location;
-  const lowercaseSearchTitle = _.lowerCase(searchedName);
+  const lowercaseSearchTitle = _.lowerCase(searchedLocation);
 
   Hotel.find({ location: { $regex: `.*${searchedLocation}.*`, $options: 'i' } })
     .then((hotels) => {
@@ -1395,6 +1402,12 @@ app.get("/allhotels/search/:location", function(req, res) {
     });
 });
 
+
+//Logic to handle empty search for hotels 
+
+app.get("/allhotels/search/", function(req,res){
+  res.render("hotelsearch", { searchResults: [], user: req.user, message : "Nothing Found" });
+});
 
 // POST route for form submission
 app.post("/allhotels/search", function(req, res) {
@@ -1717,6 +1730,8 @@ app.get("/allhotels/:hotelId/bookhotel/paypal/success", isAuthenticated, async f
       amenities: hotel.amenities.join(", ")
     };
 
+    var totalAmount = parseInt(newbooking.occupiedRooms)*parseInt(hotel.pricePerNight);
+
     await User.findByIdAndUpdate(req.user._id, { $push: { bookedHotels: newbooking } });
         console.log(booking.occupiedRooms);
         hotel.availableRooms -= booking.occupiedRooms;
@@ -1734,8 +1749,9 @@ app.get("/allhotels/:hotelId/bookhotel/paypal/success", isAuthenticated, async f
       doc.fontSize(12).text(`Name: ${newbooking.customerName}`);
       doc.fontSize(12).text(`Mobile Number: ${newbooking.mobile}`);
       doc.fontSize(12).text(`Number of Members : ${newbooking.numberOfMembers}`);
-      doc.fontSize(12).text(`Number of Rooms Booked : ${newbooking.occupiedRooms}`);
       doc.fontSize(12).text(`Hotel Name: ${newbooking.hotelName}`);
+      doc.fontSize(12).text(`Number of Rooms Booked : ${newbooking.occupiedRooms}`);
+      doc.fontSize(12).text(`Total Amount Paid: ${totalAmount}`);
       doc.fontSize(12).text(`Check In Date : ${newbooking.checkInDate}`);
       doc.fontSize(12).text(`Check Out Date : ${newbooking.checkOutDate}`);
       doc.fontSize(12).text(`Hotel Location: ${newbooking.location}`);
@@ -1766,6 +1782,7 @@ app.get("/allhotels/:hotelId/bookhotel/paypal/success", isAuthenticated, async f
       fs.createReadStream(ticketPath).pipe(res);
 
       req.session.bookingHotel = null;
+      totalAmount = 0;
       res.redirect(`/allhotels/${hotelId}`);
   }
   else{
@@ -1845,7 +1862,17 @@ app.get("/allhotels/:hotelId/download-ticket/:bookingId", isAuthenticated, async
   }
 });
 
-
+app.get("/userprofile", isAuthenticated, async function (req, res) {
+  try {
+    const destinations = await Destination.find({}).exec();
+    const hotels = await Hotel.find({}).exec();
+    const user = req.user;
+    res.render("user_profile", { user: user, destinations : destinations, hotels : hotels });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 app.get("/about", function(req, res) {
     res.render("about", {user:req.user});

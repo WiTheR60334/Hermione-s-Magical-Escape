@@ -1,4 +1,4 @@
-<%- include("partials/header"); -%>
+<%- include("partials/header", {isHotelPage : false}); -%>
 
 <section class="hotel" id="hotel" style="margin-top: 50px;">
     <% if (user && user.role === 'admin') { %>

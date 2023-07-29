@@ -1,4 +1,4 @@
-<%- include("partials/header"); -%>
+<%- include("partials/header", {isHotelPage : false}); -%>
 
 
 <section class="parallax">
@@ -162,7 +162,11 @@
     
     </section>
     
+    <section class="more-destinations" data-aos="zoom-in-up" data-aos-delay="150">
+        <a href="/userprofile">More Trips  <i class="fas fa-angle-right"></i></a>
+    </section>
     <% } %>
+
 
 
 <section class="about" id="about">
@@ -468,6 +472,11 @@
         <a href="#book-form" class="btn">book now</a>
     </div>
 </div>
+
+
+
+
+
 
 <script>
     let wizard = document.getElementById('Wizard');
