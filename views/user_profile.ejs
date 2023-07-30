@@ -3,79 +3,122 @@
 <section class="tp" style="margin-top: 120px;">
     <h1>Welcome, <%= user.name %>!</h1>
 </section>
+
+
   
   <% if (user.bookedFlights && user.bookedFlights.length > 0) { %>
-    <section class="my-schedule">
-      <h2 style="color: white; font-size : 30px; text-align : center;">My Booked Flights</h2>
-      <% user.bookedFlights.forEach((flight, index) => { %>
-        <% const destination = flight.arrival; %>
-        <% const finalDestination = destinations.find(dest => dest.title === destination); %>
-        <% if (finalDestination) { %>
-          <div class="box">
+    <section class="tickett">
+        <h2 style="color: white; font-size : 30px; text-align : center;">My Booked Flights</h2>
+        <% user.bookedFlights.forEach((flight, index) => { %>
+          <% const destination = flight.arrival; %>
+          <% const finalDestination = destinations.find(dest => dest.title === destination); %>
+          <% if (finalDestination) { %>
             <h3 style="color: white; font-size : 20px;">Trip <%= index + 1 %></h3>
-            <h3 style="color: white; font-size : 20px;"><%= flight.name %></h3>
-            <div class="box-container1">
-              <div class="box1" data-aos="fade-up" data-aos-delay="100">
-                <div class="image">
-                  <img src="<%= finalDestination.firstImg %>" alt="">
-                  <h3><i class="fas fa-map-marker-alt"></i><%= flight.arrival %></h3>
-                </div>
-                <div class="content">
-                  <div class="price">₹ 999 <span>1499</span></div>
-                  <p><%= finalDestination.firstPara %></p>
-                  <a href="/alldestinations/<%= finalDestination._id %>">Read More <i class="fas fa-angle-right"></i></a>
-                </div>
-              </div>
-              <section class="book-form" id="book-form">
-                <form action="">
-                  <div data-aos="zoom-in" data-aos-delay="150" class="inputBox">
-                    <span>From :</span>
-                    <input type="text" value="<%= flight.departure %>">
-                  </div>
-                  <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
-                    <span>To :</span>
-                    <input type="text" value="<%= flight.arrival %>">
-                  </div>
-                  <!-- <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
-                      <span>When ?</span>
-                      <input type="date" value="">
-                  </div> -->
-                  <div data-aos="zoom-in" data-aos-delay="450" class="inputBox">
-                    <span>Departure Date :</span>
-                    <input type="text" value="<%= flight.departureDate %>">
-                  </div>
-                  <!-- <input class="form-control user-success" id="starting-date" name="date" required="" type="date" value="2017-04-07" data-initialized="true" autofocus="autofocus">             -->
-                </form>
-              </section>
-              <section class="tp2">
-                <div class="wrapper">
-                  <header>
-                    <p class="current-date"></p>
-                    <div class="icons">
-                      <span id="prev" class="material-symbols-rounded">chevron_left</span>
-                      <span id="next" class="material-symbols-rounded">chevron_right</span>
-                    </div>
-                  </header>
-                  <div class="calendar">
-                    <ul class="weeks">
-                      <li>Sun</li>
-                      <li>Mon</li>
-                      <li>Tue</li>
-                      <li>Wed</li>
-                      <li>Thu</li>
-                      <li>Fri</li>
-                      <li>Sat</li>
-                    </ul>
-                    <ul class="days"></ul>
-                  </div>
-                </div>
-              </section>
+
+  
+            <div class="ticket">
+            <div id="barBig">
+                <!-- <img src="https://www.incimages.com/uploaded_files/image/1024x576/*Barcode_32896.jpg" alt="Bar Code"> -->
             </div>
-          </div>
+            <div class="mainInfo" id="mainInfo">
+                <div class="passenger-info-container">
+                    <div class="passenger-info">
+                        <span>Name of Passenger</span>
+                        <span class="details"><%= flight.name %></span>
+                    </div>
+                    <div class="passenger-info">
+                        <span>Flight</span>
+                        <span class="details">FL006</span>
+                    </div>
+                    <div class="passenger-info">
+                        <span>Date</span>
+                        <span class="details"><%= flight.departureDate %></span>
+                    </div>
+                    <div class="passenger-info">
+                        <span>Seat</span>
+                        <span class="details">8C</span>
+                    </div>
+                </div>
+                <h1 class="destination1">
+                    <%= flight.departure %>
+                    <img src="https://i.pinimg.com/originals/e9/0a/29/e90a299a041b7d37cdafc6eb2905e9d6.png" alt="Destination">
+                    <%= flight.arrival %>
+                </h1>
+                <div class="flight-info-container">
+                    <div class="flight-info">
+                        <span>Gate</span>
+                        <span>D 12</span>
+                    </div>
+                    <div class="flight-info">
+                        <span>Boarding Time</span>
+                        <span>7:30 AM IST</span>
+                    </div>
+                    <div class="flight-info">
+                        <span>ETD</span>
+                        <span>8:30 AM IST</span>
+                    </div>
+                    <div class="flight-info">
+                        <span>ETA</span>
+                        <span>10:15 AM IST</span>
+                    </div>
+                </div>
+                <p class="note">Gate closes 20 minutes before departure</p>
+            </div>
+            <div id="circles">
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+                <div class="circle"></div>
+            </div>
+            <div id="sideInfo">
+                <img src="https://www.incimages.com/uploaded_files/image/1024x576/*Barcode_32896.jpg" alt="Small Bar" id="barSmall">
+                <div class="details-container">
+                    <div class="flight-details">
+                        <div>
+                            <span>Name of Passenger</span>
+                            <span><%= flight.name %></span>
+                        </div>
+                        <div>
+                            <span>Flight</span>
+                            <span>FL006</span>
+                        </div>
+                        <div>
+                            <span>Date</span>
+                            <span>23/7/2023</span>
+                        </div>
+                        <div>
+                            <span>Seat</span>
+                            <span>8C</span>
+                        </div>
+                    </div>
+                    <div class="destination-details">
+                        <%= flight.arrival %>
+                        <img src="https://i.pinimg.com/originals/e9/0a/29/e90a299a041b7d37cdafc6eb2905e9d6.png" alt="Destination">
+                        <%= flight.departure %>
+                    </div>
+                </div>
+            </div>
+        </div>
         <% } %>
-      <% }); %>
+    <% }); %>
     </section>
-  <% } %>
+<% } %>
 
   <% if (user.bookedHotels && user.bookedHotels.length > 0) { %>
     <section class="my-schedule">
