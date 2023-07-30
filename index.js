@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const ejs = require("ejs");
+const ejs = require('ejs');
 const _ = require("lodash");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -16,6 +16,8 @@ const cron = require("node-cron");
 const paypal = require("paypal-rest-sdk");
 const flash = require("connect-flash");
 // const { PDFDocument, StandardFonts } = require('pdf-lib');
+const puppeteer = require('puppeteer');
+const path = require('path');
 
 const app = express();
 
@@ -1234,16 +1236,76 @@ app.get("/allflights/:flightId/bookflight/paypal/success", isAuthenticated, asyn
       res.setHeader("Content-type", "application/pdf");
       fs.createReadStream(ticketPath).pipe(res);
 
-      // Clear the booking data from the session
-      req.session.bookingData = null;
+      // Store the newbooking object in the session
+      req.session.newbooking = newbooking;
+      req.session.flight = flight;
+
+    // Redirect the user to the /ticket route
+      res.redirect("/ticket");
 
     } else {
       console.log("No available seats for the selected flight");
+      res.redirect("/allflights/" + req.params.flightId);
     }
   } catch (err) {
     console.log(err);
+    res.redirect("/allflights/" + req.params.flightId);
   }
-  res.redirect("/allflights/" + req.params.flightId);
+});
+
+// New ticket route
+app.get("/ticket", isAuthenticated, function (req, res) {
+  try {
+    // Retrieve the newbooking and flight objects from the session
+    const newbooking = req.session.newbooking;
+    const flight = req.session.flight;
+
+    // Render the "ticket.ejs" template with the necessary data
+    res.render("ticket", { user: req.user, newbooking: newbooking, flight: flight });
+
+    // Remove the newbooking and flight objects from the session after rendering the ticket
+    req.session.newbooking = null;
+    req.session.flight = null;
+    // Clear the booking data from the session
+    req.session.bookingData = null;
+  } catch (err) {
+    console.log(err);
+    res.redirect("/");
+  }
+});
+
+app.get('/download-ticket', async (req, res) => {
+  try {
+    // Retrieve the newbooking object from the session
+    const newbooking = req.session.newbooking;
+    const flight = req.session.flight;
+
+    if (!newbooking || !flight) {
+      // If newbooking is not found in the session, return an error or redirect as per your requirement
+      return res.status(400).send('Data not found in the session. Please book a flight first.');
+    }
+
+    const ticketTemplate = path.join(__dirname, 'views', 'ticket.ejs');
+
+    // Render the "ticket.ejs" template with the necessary data
+    const ticketHtml = await ejs.renderFile(ticketTemplate, { newbooking: newbooking, user: req.user, flight: flight });
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(ticketHtml);
+
+    // Generate PDF from the ticket HTML
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+    await browser.close();
+
+    // Set the response headers for downloading the file
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=ticket.pdf');
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Error generating ticket:', error);
+    res.status(500).send('An error occurred while generating the ticket.');
+  }
 });
 
 
@@ -1873,97 +1935,6 @@ app.get("/userprofile", isAuthenticated, async function (req, res) {
     res.status(500).send("Internal Server Error");
   }
 });
-
-// Route to handle IPN notifications
-app.post("/ipn-listener", async (req, res) => {
-  // Get the IPN message from the request body
-  const ipnMessage = req.body;
-
-  // Check if the IPN message is valid (you should implement your own validation logic)
-  const isValid = verifyIPN(ipnMessage);
-  if (!isValid) {
-    console.log("Invalid IPN message");
-    res.status(400).send("Invalid IPN message");
-    return;
-  }
-
-  // Process the payment and generate the receipt
-  try {
-    const paymentStatus = ipnMessage.payment_status;
-    const paymentAmount = ipnMessage.mc_gross; // The payment amount from the IPN message
-
-    if (paymentStatus === "Completed") {
-      // Payment is successful, generate receipt
-      const receipt = generateReceipt(ipnMessage);
-      const receiptPath = `receipt_${ipnMessage.txn_id}.pdf`;
-
-      // Save the receipt as a PDF
-      const doc = new PDFDocument();
-      doc.pipe(fs.createWriteStream(receiptPath));
-
-      doc.text(receipt, 100, 100); // Customize the receipt format as needed
-
-      doc.end();
-
-      // Send the receipt file in the response
-      res.setHeader("Content-disposition", `attachment; filename=${path.basename(receiptPath)}`);
-      res.setHeader("Content-type", "application/pdf");
-      fs.createReadStream(receiptPath).pipe(res);
-
-      // Delete the receipt file after sending it
-      fs.unlink(receiptPath, (err) => {
-        if (err) {
-          console.log("Error deleting receipt file:", err);
-        }
-      });
-    } else {
-      console.log("Payment not completed");
-      res.status(400).send("Payment not completed");
-    }
-  } catch (err) {
-    console.log("Error processing payment:", err);
-    res.status(500).send("Error processing payment");
-  }
-});
-
-// Helper function to verify IPN message (implement your own validation logic)
-// Helper function to verify IPN message
-function verifyIPN(ipnMessage) {
-
-  const verifyWebhookSignature = (transmissionId, transmissionTime, body, cb) => {
-    paypal.notification.webhookEvent.verify(transmissionId, transmissionTime, body, {
-      "client_id": process.env.PAYPAL_CLIENT_ID,
-      "client_secret": process.env.PAYPAL_CLIENT_SECRET
-    }, cb);
-  };
-
-  return new Promise((resolve, reject) => {
-    verifyWebhookSignature(ipnMessage.headers["paypal-transmission-id"], ipnMessage.headers["paypal-transmission-time"], ipnMessage.body, (error, response) => {
-      if (error) {
-        console.error("Error verifying IPN signature:", error);
-        resolve(false);
-      } else {
-        // The IPN message has been verified successfully
-        resolve(true);
-      }
-    });
-  });
-}
-
-// Helper function to generate receipt (customize the format as needed)
-function generateReceipt(ipnMessage) {
-  // Your receipt generation logic goes here
-  // Customize the format and content of the receipt based on the IPN message data
-  const receipt = `
-  Transaction ID: ${ipnMessage.txn_id}
-  Payment Amount: ${ipnMessage.mc_gross} ${ipnMessage.mc_currency}
-  Payment Status: ${ipnMessage.payment_status}
-  Payment Date: ${ipnMessage.payment_date}
-  Payer Email: ${ipnMessage.payer_email}
-
-  `;
-  return receipt;
-}
 
 
 app.get("/about", function(req, res) {
