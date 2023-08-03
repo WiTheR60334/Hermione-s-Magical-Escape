@@ -20,10 +20,12 @@
 
   </div>
 
+  <a href="/flightsearch/<%=destination.title%>" class="btn btn-priary" style="margin-top: 50px;">Book Destination</a> 
+
   <% if (user && user.role === 'admin') { %>
     <div class="admin-buttons">
       <a href="/alldestinations/<%= destination._id %>/edit" class="btn btn-primary">Edit Post</a>
-      <form action="/alldestinations/<%= destination._id %>delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+      <form action="/alldestinations/<%= destination._id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
         <button type="submit" class="btn btn-danger">Delete Post</button>
       </form>
     </div>

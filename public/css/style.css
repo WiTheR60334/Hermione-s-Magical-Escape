@@ -554,22 +554,21 @@ section {
   margin-top: 9rem;
   width: 90%;
   border-radius: 1rem;
-  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.7)), url("../images/home-bg2.jpg") no-repeat;
-  filter: brightness(200%);
+  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.1)), url("/images/dashboard.jpeg") no-repeat;
+  /* filter: brightness(200%); */
   background-size: cover;
   background-position: center;
   display: flex;
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  /* align-items: center; */
   justify-content: center;
   padding-bottom: 5rem;
 }
-
 .home .content {
   text-align: center;
 }
-
 .home .content span {
   font-weight: bolder;
   color: transparent;
@@ -577,31 +576,168 @@ section {
   font-size: 5vw;
   display: block;
 }
-
 @media (max-width: 768px) {
   .home .content span {
     font-size: 3.5rem;
   }
 }
-
-.home .content h3 {
-  font-size: 6vw;
+.home  h3 {
+  font-size: 8rem;
   color: var(--textcolor1);
+  display: flex;
+  justify-content: center;
+  margin-top: -55rem;
+}
+.home p{
+    font-size: 2.5rem;
+    color: var(--textcolor1);
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+
 }
 
+
+.tp  h1 {
+  font-size: 4.5rem;
+  color: var(--textcolor1);
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  /* margin: 5rem;  */
+  margin-top: 5rem;
+  margin-bottom:5rem ;
+}
 @media (max-width: 768px) {
-  .home .content h3 {
-    font-size: 4rem;
-  }
+.home .content h3 {
+  font-size: 4rem;
+}
 }
 
-.home .content p {
-  max-width: 60rem;
+
+.my-schedule .box-container .book-form{
+  width: 80%;
   margin: 1rem auto;
-  font-size: 1.4rem;
-  color: var(--cyan);
-  line-height: 2;
+  margin-top: 1rem;
+  background: var(--bgcolor2);
+  position: relative;
+  z-index: 1;
+  /* margin-left: 15rem; */
+  border-radius: 1rem;
+  /* box-shadow: 0 0.5rem 1rem rgba(17, 17, 17, 0.3); */
+  padding: 3rem 2rem;
+  border: .1rem solid var(--bordercolor);
 }
+.tp2{
+  /* margin-left: 10rem; */
+  color: var(--textcolor1);
+  font-size: 1rem;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+.wrapper{
+margin-left: -1rem;
+width: 450px;
+background: var(--bgcolor1);
+border-radius: 10px;
+margin-top: 5rem;
+align-items: center;
+justify-content: center;
+text-align: center;
+border: .1rem solid var(--bordercolor);
+
+@media (max-width:768px) {
+  width: 200px;
+}
+}
+.wrapper header{
+display: flex;
+align-items: center;
+padding: 25px 100px 10px;
+justify-content: space-between;
+@media (max-width:768px) {
+  padding: 15px 50px 9px;
+}
+}
+header .icons{
+display: flex;
+}
+header .icons span{
+height: 38px;
+width: 38px;
+margin: 0 1px;
+cursor: pointer;
+color: #878787;
+text-align: center;
+line-height: 38px;
+font-size: 1.9rem;
+user-select: none;
+border-radius: 50%;
+}
+.icons span:last-child{
+margin-right: -10px;
+}
+header .icons span:hover{
+background: #f2f2f2;
+}
+header .current-date{
+font-size: 1.45rem;
+font-weight: 500;
+}
+.calendar{
+padding: 20px;
+}
+.calendar ul{
+display: flex;
+flex-wrap: wrap;
+list-style: none;
+text-align: center;
+}
+.calendar .days{
+margin-bottom: 20px;
+}
+.calendar li{
+color: var(--textcolor1);
+width: calc(100% / 7);
+font-size: 1.5rem;
+}
+.calendar .weeks li{
+font-weight: 500;
+cursor: default;
+}
+.calendar .days li{
+z-index: 1;
+cursor: pointer;
+position: relative;
+margin-top: 15px;
+}
+.days li.inactive{
+color: var(--bgcolor2);
+}
+.days li.active{
+color: #fff;
+}
+.days li::before{
+position: absolute;
+content: "";
+left: 50%;
+top: 50%;
+height: 40px;
+width: 40px;
+z-index: -1;
+border-radius: 50%;
+transform: translate(-50%, -50%);
+}
+.days li.active::before{
+background: #9B59B6;
+}
+.days li:not(.active):hover::before{
+background: var(--bordercolor);
+}
+
 
 .book-form {
   width: 80%;
@@ -748,21 +884,22 @@ select option {
   background: var(--bgcolor2);
 }
 
+.my-schedule .box-container1 .box1:hover img,
 .destination .box-container .box:hover img {
   transform: scale(1.1);
 }
-
+ .my-schedule .box-container1 .box1 .image,
 .destination .box-container .box .image {
   height: 20rem;
   overflow: hidden;
   width: 100%;
 }
-
+.my-schedule .box-container1 .box1 .image img,
 .destination .box-container .box .image img {
   height: 100%;
   width: 100%;
   -o-object-fit: cover;
-  object-fit: cover;
+     object-fit: cover;
 }
 
 .destination .box-container .box .image h3 {
@@ -777,56 +914,72 @@ select option {
   padding: .5rem 1.5rem;
 }
 
-.destination .box-container .box .content .price {
+.my-schedule .box-container1 .box1 .content .price,
+.destination .box-container .box .content .price{
   font-weight: 600;
   color: var(--textcolor1);
   font-size: 2.5rem;
 }
-
-.destination .box-container .box .content .price span {
+.my-schedule .box-container1 .box1 .content .price span,
+.destination .box-container .box .content .price span{
   font-weight: lighter;
   color: var(--text-color2);
   font-size: 1.5rem;
   text-decoration: line-through;
 }
-
-.destination .box-container .box .image h3 i {
-  color: var(--orange);
-  margin-right: 1rem;
+.my-schedule .box-container1 .box1 .image h3 i,
+.destination .box-container .box .image h3 i{
+  color: var(--orange); 
+  margin-right: 1rem;  
   font-size: 2rem;
 }
-
+.my-schedule .box-container1 .box1 .content,
 .destination .box-container .box .content {
   padding: 2rem;
   text-align: center;
 }
-
+.my-schedule .box-container1 .box1 .content h3,
 .destination .box-container .box .content h3 {
   font-size: 2rem;
   color: var(--textcolor1);
 }
-
+.my-schedule .box-container1 .box1 .content p,
 .destination .box-container .box .content p {
   padding: 1rem 0;
   font-size: 1.4rem;
   color: var(--cyan);
   line-height: 2;
 }
-
+.my-schedule .box-container1 .box1 .content a,
 .destination .box-container .box .content a {
   font-size: 1.7rem;
   color: var(--bordercolor);
 }
-
+.my-schedule .box-container1 .box1 .content a:hover i,
 .destination .box-container .box .content a:hover i {
   padding-left: 1rem;
 }
-
+.my-schedule .box-container1 .box1 .content a i,
 .destination .box-container .box .content a i {
   padding-right: 0.5rem;
 }
 
 
+
+.my-schedule .box-container1 .tp2{
+  margin-top: -7rem;
+  display: block;
+  /* grid-template-columns: repeat(auto-fit, minmax(100rem, 1fr)); */
+}
+.my-schedule .box-container1{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(34rem, .1fr));
+  gap: 3rem;
+  margin-top: 2rem;
+  @media (max-width:768px) {
+    grid-template-columns: repeat(auto-fit, minmax(25rem, .1fr));
+  }
+}
 
 .login {
   display: grid;
@@ -1814,6 +1967,110 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /*# sourceMappingURL=style.css.map */
 
 
+/*My Stles*/
+
+.hotel .heading span {
+  text-align: center;
+}
+
+.hotel .heading h1 {
+  text-align: center;
+  padding-bottom: 2rem;
+}
+
+.hotel .box-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(34rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.hotel .box-container .box {
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--bgcolor2);
+}
+
+.hotel .box-container .box:hover img {
+  transform: scale(1.1);
+}
+
+.hotel .box-container .box .image {
+  height: 20rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+.hotel .box-container .box .image img {
+  height: 100%;
+  width: 100%;
+  -o-object-fit: cover;
+  object-fit: cover;
+}
+
+.hotel .box-container .box .image h3 {
+  position: absolute;
+  top: 1.3rem;
+  left: 1.3rem;
+  font-size: 2rem;
+  color: var(--textcolor1);
+  background: rgba(0, 0, 0, .5);
+  border-radius: 1rem;
+  font-weight: lighter;
+  padding: .5rem 1.5rem;
+}
+
+.hotel .box-container .box .content .price {
+  font-weight: 600;
+  color: var(--textcolor1);
+  font-size: 2.5rem;
+}
+
+.hotel .box-container .box .content .price span {
+  font-weight: lighter;
+  color: var(--text-color2);
+  font-size: 1.5rem;
+  text-decoration: line-through;
+}
+
+.hotel .box-container .box .image h3 i {
+  color: var(--orange);
+  margin-right: 1rem;
+  font-size: 2rem;
+}
+
+.hotel .box-container .box .content {
+  padding: 2rem;
+  text-align: center;
+}
+
+.hotel .box-container .box .content h3 {
+  font-size: 2rem;
+  color: var(--textcolor1);
+}
+
+.hotel .box-container .box .content p {
+  padding: 1rem 0;
+  font-size: 1.4rem;
+  color: var(--cyan);
+  line-height: 2;
+}
+
+.hotel .box-container .box .content a {
+  font-size: 1.7rem;
+  color: var(--bordercolor);
+}
+
+.hotel .box-container .box .content a:hover i {
+  padding-left: 1rem;
+}
+
+.hotel .box-container .box .content a i {
+  padding-right: 0.5rem;
+}
+
+
+
 
 .container {
   max-width: 600px;
@@ -1835,4 +2092,66 @@ input.form-control {
   padding: 10px;
   width: 100%;
   resize: vertical;
+}
+
+
+.my-schedule .box-container{
+  width: 85%;
+  margin: 1rem auto;
+  margin-top: -5rem;
+  background: var(--bgcolor2);
+  position: relative;
+  z-index: 1;
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  margin-bottom: 5rem;
+}
+
+.my-schedule .box-container .box1{
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--bgcolor2);
+  border: .15rem solid var(--bordercolor);
+}
+.my-schedule .box-container .box h3{
+  font-size: 2.5rem;
+  color: var(--textcolor1);
+  margin-bottom: 1.5rem;
+  margin-top: -2rem;
+}
+.my-schedule .box-container span{
+  font-size: 2rem;
+  color: var(--cyan);
+
+}
+
+
+.my-schedule .box-container1 .box1 .image h3{
+  position: absolute;
+  top: 3rem;left: 1rem;
+  font-size: 2rem;
+  color: var(--textcolor1);
+  background: rgba(0, 0, 0, .5);
+  border-radius: 1rem;
+  font-weight: lighter;
+  padding: .5rem 1.5rem;
+}
+
+.home .tp{
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+.home .btn{
+  display :flex;
+  align-items : center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.tp2 .calendar .days .selected-date {
+  background-color: #FFD700;
+  color: #333;
+  border-radius: 50%;
 }

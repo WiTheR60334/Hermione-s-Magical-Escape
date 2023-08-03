@@ -1,0 +1,85 @@
+<%- include("partials/header"); -%>
+
+<section class="hotel" id="hotel" style="margin-top: 100px;">
+  <div class="heading" style="margin-top : 100px;">
+    <span><%=hotel.name%> Hotel Details</span>
+    <h1 style="font-size: 5rem;"><%= hotel.name %></h1>
+  </div>
+
+  <div class="content" style="color: whitesmoke; font-size: 2rem;">
+    <h2 style="margin-top: 20px;">Intorduction</h2>
+    <p style="margin-top: 20px; margin-bottom : 20px;"><%= hotel.firstPara %></p>
+    <h2 style="margin-top: 20px; margin-bottom : 20px;">Description</h2>
+    <p style="margin-top: 20px; margin-bottom : 20px;"><%= hotel.description %></p>
+    <h2 style="margin-top: 20px; margin-bottom : 20px;">List of Amenities :</h2>
+    <ul style="margin-top: 20px; margin-bottom : 20px;">
+       <% hotel.amenities.forEach(function(amenity){ %>
+            <li><%= amenity%></li>
+       <% }); %>
+    </ul>
+    <p style="margin-top: 20px; margin-bottom : 20px;"><span style="color: var(--bordercolor);">Hotel Location : </span> <%=hotel.location%></p>
+    <p style="margin-top: 20px; margin-bottom : 20px;"><span style="color: var(--bordercolor);;">Price Per Night for hotel :</span> <%=hotel.pricePerNight%></p>
+    <p><span style="color: var(--bordercolor);;">Number of Available Rooms :</span> <%=hotel.availableRooms%></p>
+    <p style="margin-top: 20px; margin-bottom : 20px;"><span style="color: var(--bordercolor);;">Rating for hotel :</span>
+      <div class="stars" style="color: var(--orange);">
+        <% const fullStars = Math.floor(hotel.rating); %>
+        <% const halfStar = hotel.rating % 1 !== 0; %>
+        <% const emptyStars = 5 - Math.ceil(hotel.rating); %>
+        <% for (let i = 0; i < fullStars; i++) { %>
+          <i class="fas fa-star"></i>
+        <% } %>
+        <% if (halfStar) { %>
+          <i class="fas fa-star-half-alt"></i>
+        <% } %>
+        <% for (let i = 0; i < emptyStars; i++) { %>
+          <i class="far fa-star"></i>
+        <% } %>
+      </div>
+    </p>
+    <p style="margin-top: 20px; margin-bottom : 20px;"><span style="color: var(--bordercolor);">Total Rooms in hotel :</span> <%=hotel.totalRooms%></p>
+
+  </div>
+
+  <div class="images">
+    <img src="<%=hotel.firstImg%>" class="firstImg" alt="<%=hotel.name%>" />
+
+    <% hotel.images.forEach(function(image){ %>
+      <img src="<%=image%>" alt="<%=hotel.name%>" />
+    <% }); %>
+
+
+</div>
+<a href="/allhotels" style="margin-top: 10px; margin-bottom : 10px; color : blue; font-size : 2rem; display:block">Back to All Hotels</a>
+
+  
+  <% if (user && user.role === 'user') { %>
+    <% if (!user.bookedHotels.some(booking => booking.hotel.toString() === hotel._id.toString())) { %>
+      <form action="/allhotels/<%= hotel._id %>/bookhotel" method="get">
+        <button type="submit" class="btn btn-primary">Book Now</button>
+      </form>
+    <% } %>
+
+    <% user.bookedHotels.forEach(function(bookedHotel) { %>
+      <% if (bookedHotel.hotel.toString() === hotel._id.toString()) { %>
+        <% if (bookedHotel.ticketPath) { %>
+          <a href="<%= bookedHotel.ticketPath %>" download class="btn btn-primary">Download Ticket</a>
+        <% } %>
+        <form action="/allhotels/<%= hotel._id %>/cancelbooking/<%=bookedHotel._id%>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+          <button type="submit" class="btn btn-danger">Cancel Booking</button>
+        </form>
+      <% } %>
+    <% }); %>
+  <% } %>
+
+
+  <% if (user && user.role === 'admin') { %>
+    <div class="admin-buttons">
+      <a href="/allhotels/<%= hotel._id %>/edit" class="btn btn-primary">Edit Post</a>
+      <form action="/allhotels/<%= hotel._id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');">
+        <button type="submit" class="btn btn-danger">Delete Post</button>
+      </form>
+    </div>
+  <% } %>
+</section>
+
+<%- include("partials/footer"); -%>

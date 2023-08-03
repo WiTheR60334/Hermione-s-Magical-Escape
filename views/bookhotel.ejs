@@ -1,0 +1,83 @@
+<!-- bookflight.ejs -->
+
+<%- include("partials/header"); -%>
+
+<section class="container" style="font-size: 2rem; color:white; margin-top: 100px;">
+  <h1 style="font-size: 4rem; margin-bottom:30px;">Enter Your Hotel Booking Details</h1>
+  <h2 style="font-size: 2rem; margin-bottom:30px;">Rooms will be booked according to number of members</h2>
+  <p style="color: white;">Only 2 members wil be allowed in 1 room</p>
+
+  <div class="form-container">
+    <form action="/allhotels/<%= hotelId %>/bookhotel" method="POST">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="Name" placeholder="Enter your name" value="<%=user.name%>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="mobile">Mobile</label>
+        <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="numberOfMembers">Number of Members :</label>
+        <input type="number" id="numberOfMembers" name="numberOfMembers" placeholder="Enter number of members" required>
+      </div>
+
+      <!-- Disabled input tag to display the number of rooms occupied -->
+      <div class="form-group">
+        <label for="numberOfRooms">Number of Rooms Occupied:</label>
+        <input type="number" id="numberOfRooms" name="numberOfRooms" readonly>
+      </div>
+
+      <div class="form-group">
+        <label for="checkInDate">Check In Date :</label>
+        <input type="date" id="checkInDate" name="checkInDate" placeholder="Enter your Check In Date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="checkOutDate">Check Out Date :</label>
+        <input type="date" id="checkOutDate" name="checkOutDate" placeholder="Enter your Check Out Date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email address" value="<%=user.username%>" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <% if (user && user.role === 'user' && user.bookedHotels.some(booking => booking.hotel.toString() === hotelId)) { %>
+        <% user.bookedHotels.forEach(function(bookedHotel){ %>
+          <% if (bookedHotel.hotel.toString() === hotelId) { %>
+            <% if (bookedHotel.ticketPath) { %>
+              <a href="<%= bookedHotel.ticketPath %>" download class="btn btn-primary">Download Ticket</a>
+            <% } %>
+          <% } %>
+        <% }); %>
+      <% } %>
+
+  </div>
+</section>
+
+<%- include("partials/footer"); -%>
+
+<script>
+    // Get references to the input fields
+    const numberOfMembersInput = document.querySelector('#numberOfMembers');
+    const numberOfRoomsInput = document.querySelector('#numberOfRooms');
+  
+    // Function to update the number of rooms occupied based on the number of members entered
+    function updateNumberOfRooms() {
+      const numberOfMembers = parseInt(numberOfMembersInput.value, 10);
+      const numberOfRooms = numberOfMembers % 2 === 0 ? numberOfMembers / 2 : Math.floor(numberOfMembers / 2) + 1;
+      numberOfRoomsInput.value = numberOfRooms;
+    }
+  
+    // Attach an event listener to the numberOfMembersInput to update the numberOfRoomsInput when the number of members changes
+    numberOfMembersInput.addEventListener('input', updateNumberOfRooms);
+  
+    // Call the updateNumberOfRooms function initially to set the value of numberOfRoomsInput
+    updateNumberOfRooms();
+  </script>

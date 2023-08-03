@@ -1,0 +1,54 @@
+<%- include("partials/header"); -%>
+<div class="heading">
+    <h1 class="text heading" style="margin-top: 100px;">Add New Hotel</h1>
+</div>
+</div>
+<form action="/newhotel" method="post" style="color: white; font-size: 2rem;">
+  <div class="form-group">
+    <label for="hotelName">Hotel Name</label>
+    <input type="text" class="form-control" id="hotelName" name="hotelName" required>
+  </div>
+  <div class="form-group">
+    <label for="firstPara">First Short Paragraph</label>
+    <input type="text" class="form-control" id="FirstPara" name="firstPara"  required>
+  </div>
+  <div class="form-group">
+    <label for="hotelDescription">Description</label>
+    <textarea class="form-control" id="hotelDescription" name="hotelDescription" style="white-space: pre-wrap;" rows="8" required></textarea>
+  </div>
+  <div class="form-group">
+    <label for="hotelLocation">Location</label>
+    <input type="text" class="form-control" id="hotelLocation" name="hotelLocation"  required>
+  </div>
+  <div class="form-group">
+    <label for="hotelAmenities">Amenities</label>
+    <input type="text" class="form-control" id="hotelAmenities" name="hotelAmenities"  required>
+  </div>
+  <div class="form-group">
+    <label for="pricePerNight">Price Per Night</label>
+    <input type="text" class="form-control" id="pricePerNight" name="pricePerNight"  required>
+  </div>
+  <div class="form-group">
+    <label for="hotelRating">Rating</label>
+    <input type="text" class="form-control" id="hotelRating" name="hotelRating"  required>
+  </div>
+  <div class="form-group">
+    <label for="availableRooms">Available Rooms</label>
+    <input type="text" class="form-control" id="availableRooms" name="availableRooms" required>
+  </div>
+  <div class="form-group">
+    <label for="totalRooms">Total Rooms</label>
+    <input type="text" class="form-control" id="totalRooms" name="totalRooms"  required>
+  </div>
+  <div class="form-group">
+    <label for="firstImg">First Image URL</label>
+    <input type="text" class="form-control" id="firstImg" name="firstImg"  required>
+  </div>
+  <div class="form-group">
+    <label for="imageLink">Images Link</label>
+    <input type="text" class="form-control" id="imageLink" name="imageLink">
+  </div>
+  <button type="submit" class="btn btn-primary">Add Hotel</button>
+</form>
+
+<%- include("partials/footer"); -%>

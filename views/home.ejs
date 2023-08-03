@@ -1,19 +1,32 @@
 <%- include("partials/header"); -%>
 
 <section class="home" id="home">
-    <div class="content">
-        <span data-aos="fade-up" data-aos-delay="150">Follow Us</span>
-        <h3 data-aos="fade-up" data-aos-delay="300">To The Unknown</h3>
-        <p data-aos="fade-up" data-aos-delay="450">Harry Potter Shitttt</p>
-        <a data-aos="fade-up" data-aos-delay="600" href="/allflights" class="btn">Book Now</a>
+    <!-- <div class="content"> -->
+    <% if(user && user.role === "user") { %>
+      <% if(user.googleId) { %>
+        <h3 data-aos="fade-up" data-aos-delay="300" style="padding-top: 400px;">Hello, <%= user.googleDisplayName %></h3>
+      <% } else { %>
+        <h3 data-aos="fade-up" data-aos-delay="300" style="padding-top: 400px;">Hello, <%= user.name %></h3>
+      <% } %>
+      <p data-aos="fade-up" data-aos-delay="400" >Enter the realm of enchantment and seek wisdom in our magical conversation.</p>
+    <% } else if(user && user.role === "admin") { %>
+      <h3 data-aos="fade-up" data-aos-delay="300" style="padding-top: 400px;">Hello, Admin</h3>
+      <p data-aos="fade-up" data-aos-delay="400">Enter the realm of enchantment and seek wisdom in our magical conversation.</p>
+    <% } else { %>
+      <h3 data-aos="fade-up" data-aos-delay="300" style="padding-top: 400px">Follow Us Unknown</h3>
+      <p data-aos="fade-up" data-aos-delay="400">Enter the realm of enchantment and seek wisdom in our magical conversation.</p>
+    <% } %>
+    <div class="tp">
+      <a data-aos="fade-up" data-aos-delay="600" href="/allflights" class="btn">Book Now</a>
     </div>
-</section>
+    <!-- </div> -->
+  </section>
 
 <section class="book-form" id="book-form">
-    <form action="">
+    <form action="/allflights/search" method="post">
         <div data-aos="zoom-in" data-aos-delay="150" class="inputBox">
         <span>From :</span>
-            <select name="from" id="from-select">
+            <select  name="departure" id="from-select">
                 <option value="" disabled selected>Select a state</option>
             <option value="Andhra Pradesh">Andhra Pradesh</option>
             <option value="Arunachal Pradesh">Arunachal Pradesh</option>
@@ -47,7 +60,7 @@
         </div>
         <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
             <span>Where :</span>
-            <select name="from" id="from-select">
+            <select  name="arrival" id="from-select">
                 <option value="" disabled selected>Select the place</option>
                 <option value="Hogwarts Castle">Hogwarts Castle</option>
                 <option value="Diagon Alley">Diagon Alley</option>
@@ -61,15 +74,95 @@
         </div>
         <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
             <span>When ?</span>
-            <input type="date" value="">
+            <input type="date" name="departureDate" value="">
         </div>
         <div data-aos="zoom-in" data-aos-delay="450" class="inputBox">
-            <span>How Many ?</span>
-            <input type="number" placeholder="number of travelers" value="">
+            <span>Adults(16+)</span>
+            <input type="number" placeholder="number of travelers" name="adults" value="">
+        </div>
+        <div data-aos="zoom-in" data-aos-delay="450" class="inputBox">
+            <span>Children</span>
+            <input type="number" placeholder="number of travelers" name="children" value="">
         </div>
         <input data-aos="zoom-in" data-aos-delay="600" type="submit" value="find now" class="btn">
     </form>
 </section>
+
+
+
+<% if(user && user.role==="user" && user.bookedFlights && user.bookedFlights.length > 0 && destination !== null && user.bookedFlights[0].arrival){ %>
+<section class="tp">    
+    <h1>My Schedule</h1>
+</section>
+
+<section class="my-schedule">
+    <% bookedFlight = user.bookedFlights[0] %>
+    <div class="box-container">
+        <div class="box">
+            <h3>Trip 1</h3>
+            <h3><%= bookedFlight.name %></h3>
+            <div class="box-container1">
+                <div class="box1" data-aos="fade-up" data-aos-delay="100">
+                    <div class="image">
+                        <img src="<%= destination.firstImg %>" alt="">
+                        <h3><i class="fas fa-map-marker-alt"></i><%= destination.title %></h3>
+                    </div>
+                    <div class="content">
+                        <div class="price">₹ 999 <span>1499</span></div>
+                        <p><%= destination.firstPara %></p>
+                        <a href="/alldestinations/<%= destination._id %>">Read More <i class="fas fa-angle-right"></i></a>
+                    </div>
+                <!-- <span>Location : Hogwarts Castle</span>
+                <span>Numb </span> -->
+            </div> 
+        <section class="book-form" id="book-form">
+            <form action="">
+                <div data-aos="zoom-in" data-aos-delay="150" class="inputBox">
+                <span>From :</span>
+                    <input type="text" value="<%= bookedFlight.departure %>">
+                </div>
+                <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
+                    <span>To :</span>
+                    <input type="text" value="<%= bookedFlight.arrival %>">
+                </div>
+                <!-- <div data-aos="zoom-in" data-aos-delay="300" class="inputBox">
+                    <span>When ?</span>
+                    <input type="date" value="">
+                </div> -->
+                <div data-aos="zoom-in" data-aos-delay="450" class="inputBox">
+                    <span>Departure Date :</span>
+                    <input type="text"  value="<%= bookedFlight.departureDate %>">
+                </div>
+                <!-- <input class="form-control user-success" id="starting-date" name="date" required="" type="date" value="2017-04-07" data-initialized="true" autofocus="autofocus">             -->
+            </form>
+     </section>
+     <section class="tp2">
+        <div class="wrapper">
+            <header>
+              <p class="current-date"></p>
+              <div class="icons">
+                <span id="prev" class="material-symbols-rounded">chevron_left</span>
+                <span id="next" class="material-symbols-rounded">chevron_right</span>
+              </div>
+            </header>
+            <div class="calendar">
+              <ul class="weeks">
+                <li>Sun</li>
+                <li>Mon</li>
+                <li>Tue</li>
+                <li>Wed</li>
+                <li>Thu</li>
+                <li>Fri</li>
+                <li>Sat</li>
+              </ul>
+              <ul class="days"></ul>
+            </div>
+          </div>
+    </section>
+
+</section>
+
+<% } %>
 
 
 <section class="about" id="about">
@@ -181,6 +274,38 @@
 </section>
 
 
+<section class="destination" id="destination">
+    <div class="heading">
+        <span>Our Hotel Packages</span>
+        <h1>Explore the Mysterious Realms of Magic
+        </h1>
+    </div>
+
+    <div class="box-container">
+        <% let animationTimer = 100; %>
+        <% hotels.forEach(function(hotel, index){ %>
+          <div class="box" data-aos="fade-up" data-aos-delay="<%= animationTimer %>">
+            <div class="image">
+              <img src="<%= hotel.firstImg %>" alt="">
+              <h3><i class="fas fa-map-marker-alt"></i><%= hotel.name %></h3>
+            </div>
+            <div class="content">
+              <div class="price">₹ <%= hotel.pricePerNight %> <span>1499</span></div>   
+              <p><%= hotel.firstPara %></p>
+              <a href="/allhotels/<%= hotel._id %>">Read More <i class="fas fa-angle-right"></i></a>
+            </div>
+          </div> 
+          <% animationTimer += 100; %>
+          <% if (index === hotels.length - 1) { %>
+            <% animationTimer = 100; %>
+          <% } %>
+        <% }); %>
+      </div>
+      
+      <a href="/allhotels" class="btn btn-primary">More Hotels</a>
+</section>
+
+
 <section class="services" id="services">
     <div class="heading">
         <span>Our Services</span>
@@ -190,7 +315,7 @@
     <div class="box-container">
         <div class="box" data-aos="zoom-in-up" data-aos-delay="150">
             <i class="fas fa-globe"></i>
-            <h3>Worldwide</h3>
+            <h3><a href="/alldestinations" style="color : white;">Worldwide</a></h3>
         </div>
 
         <div class="box" data-aos="zoom-in-up" data-aos-delay="300">
@@ -207,19 +332,19 @@
 
         <div class="box" data-aos="zoom-in-up" data-aos-delay="600">
             <i class="fas fa-hotel"></i>
-            <h3>Affordable Hotels</h3>
+            <h3><a href="/allhotels" style="color : white;">Affordable Hotels</a></h3>
             <p></p>
         </div>
 
         <div class="box" data-aos="zoom-in-up" data-aos-delay="750">
             <i class="fas fa-wallet"></i>
-            <h3>Affordable Price</h3>
+            <h3><a href="/allflights" style="color : white;">Affordable Price</a></h3>
             <p></p>
         </div>
 
         <div class="box" data-aos="zoom-in-up" data-aos-delay="900">
             <i class="fas fa-headset"></i>
-            <h3>24/7 Support</h3>
+            <h3><a href="/contact" style="color : white;">24/7 Support</a></h3>
             <p></p>
         </div>
     </div>

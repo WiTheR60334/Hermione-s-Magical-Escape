@@ -12,6 +12,8 @@ const session = require("express-session");
 const { ObjectId } = require('mongoose').Types;
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const cron = require("node-cron");
+// const { PDFDocument, StandardFonts } = require('pdf-lib');
 
 const app = express();
 
@@ -76,6 +78,10 @@ const usersSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Flight',
       },
+      destination : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "Destination"
+      },
       name: String,
       mobile: String,
       passportNumber: String,
@@ -83,6 +89,22 @@ const usersSchema = new mongoose.Schema({
       departure: String,
       arrival: String,
       departureDate: Date,
+    }],
+    bookedHotels: [{
+      hotel: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Hotel',
+      },
+      hotelName: String,
+      checkInDate: Date,
+      checkOutDate: Date,
+      customerName: String,
+      numberOfMembers : Number,
+      occupiedRooms : Number,
+      mobile: String,
+      email: String,
+      passportNumber: String,
+      ticketPath: String,
     }],
     transactions: [{
       type: mongoose.Schema.Types.ObjectId,
@@ -219,7 +241,81 @@ const scheduleSchema = new mongoose.Schema({
   // Create the Transaction model
   const Transaction = mongoose.model('Transaction', transactionSchema);
   
+
+  //Schema and Model for Hotels 
+
+  const hotelsSchema = new mongoose.Schema({
+    name: {
+      type: String,
+      required: true,
+    },
+    location: {
+        type: String,
+        required: true,
+    },
+    firstImg: {
+      type: String,
+      required: true,
+    },
+    firstPara: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    amenities: {
+      type: [String], // Array of strings representing amenities (e.g., "Wi-Fi", "Swimming Pool")
+      required: true,
+    },
+    pricePerNight: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 3,
+    },
+    images: {
+      type: [String], // Array of image URLs for hotel images
+      
+    },
+    availableRooms: {
+      type: Number,
+      required: true,
+    },
+    totalRooms: {
+      type: Number,
+      required: true,
+    },
+    // Additional fields can be added based on your requirements
+  });
   
+  const Hotel = mongoose.model('Hotel', hotelsSchema);
+
+  const hotel1 = new Hotel({
+    name:'Grand Hyatt Regency London Marriott City Centre',
+    location : "Hogwarts Castle",
+    pricePerNight: '$498 per night',
+    rating: 4.6,
+    firstPara : "This is a great hotel with great features and highest review ever got by a hotel.",
+    description : "MoreOver this hotel serves good customer service as well as great amount of amenities also in good quality so this is liked by most of our customers. Give it a try and then experience a next world of hotels",
+    amenities : ["Great Lake View Hotel", "A-one Qquality Rooms with extra comfort", "Fresh and good quality food"],
+    availableRooms : 1000,
+    totalRooms : 1000,
+    firstImg : "https://crowne-plaza-london-the-city-hotel.booked.net/data/Photos/r1326x761/14255/1425561/1425561937/Hyatt-Regency-London-Blackfriars-Hotel-Exterior.JPEG",
+    images : ["https://crowne-plaza-london-the-city-hotel.booked.net/data/Photos/640x460/14255/1425562/1425562201/Hyatt-Regency-London-Blackfriars-Hotel-Exterior.JPEG"]
+
+  });
+  
+  
+  // hotel1.save()
+  // .then(() => console.log('Hotel 1 saved successfully'))
+  // .catch((err) => console.error('Error saving Hotel 1:', err));
+
   // Example code to create and store flight information
   const flight1 = new Flight({
     flightID: 'FL001',
@@ -276,17 +372,55 @@ const scheduleSchema = new mongoose.Schema({
   );
   
 
-app.get("/", function(req, res) {
-    Destination.find({})
-    .limit(6)
-    .exec()
-    .then((foundDestinations)=>{
-        res.render("home",{destinations : foundDestinations, user:req.user});
-    })
-    .catch((err)=>{
+// Function to delete flights that are 8 days old
+const deleteOutdatedFlights = async () => {
+  try {
+    const eightDaysAgo = new Date();
+    eightDaysAgo.setDate(eightDaysAgo.getDate() - 8);
+
+    // Delete flights that are older than eightDaysAgo
+    await Flight.deleteMany({ departureDate: { $lt: eightDaysAgo } });
+    console.log('Outdated flights deleted successfully.');
+  } catch (err) {
+    console.error('Error deleting outdated flights:', err);
+  }
+};
+
+// Schedule the deleteOutdatedFlights function to run daily at midnight (00:00)
+cron.schedule('0 0 * * *', deleteOutdatedFlights);
+
+
+
+  app.get("/", async function(req, res) {
+    try {
+        const foundDestinations = await Destination.find({}).limit(6).exec();
+        const foundHotels = await Hotel.find({}).limit(6).exec();
+
+        let finalDestination = null;
+        if (req.user && req.user.role === "user") {
+          if(req.user.bookedFlights.length>0){
+            const destination = req.user.bookedFlights[0].arrival;
+            // console.log(destination)
+            if (destination !== null) {
+                finalDestination = await Destination.findOne({ title: destination }).exec();
+            }
+          }
+        }
+
+        if (finalDestination !== null) {
+          res.render("home", { destinations: foundDestinations, user: req.user, destination: finalDestination, hotels : foundHotels });
+      } else {
+          res.render("home", { destinations: foundDestinations, user: req.user, hotels : foundHotels });
+      }
+
+        // console.log(finalDestination);
+    } catch (err) {
         console.log(err);
-    });
+        res.status(500).send("Internal Server Error");
+    }
 });
+
+
 
 // User Sign Up
 app.get("/signup", function(req, res) {
@@ -437,6 +571,23 @@ app.get('/allflights', function(req, res) {
       });
   });
   
+
+ //Flights Redirect route form destinations
+ 
+ app.get('/flightsearch/:destinationTitle', function(req, res) {
+  const destinationTitle = req.params.destinationTitle;
+
+  Flight.find({ arrival: { $regex: new RegExp(destinationTitle, 'i') } })
+    .exec()
+    .then((allFlights) => {
+      res.render('allflights_destination', { allFlights: allFlights, user: req.user, destination: destinationTitle });
+    })
+    .catch((err) => {
+      console.error('Error retrieving flights:', err);
+      res.redirect('/');
+    });
+});
+
   
 
 app.get("/alldestinations",function(req,res){
@@ -887,6 +1038,7 @@ app.post("/alldestinations/:destinationId/delete-image", isAuthenticated, functi
 
       doc.pipe(stream);
       doc.fontSize(12).text(`Name: ${booking.name}`);
+      doc.fontSize(12).text(`${booking.departure} to ${booking.arrival}`);
       doc.fontSize(12).text(`Passport Number: ${booking.passportNumber}`);
       doc.fontSize(12).text(`Mobile Number: ${booking.mobile}`);
       doc.fontSize(12).text(`Email Address: ${booking.email}`);
@@ -941,6 +1093,363 @@ app.post("/allflights/:flightId/cancelbooking/:bookingId", isAuthenticated, asyn
 });
 
 
+
+
+// Hotels Route for rendering, editing and updating
+
+app.get("/allhotels",function(req,res){
+  Hotel.find({})
+  .exec()
+  .then((foundHotels)=>{
+      res.render("allhotels",{hotels : foundHotels, user:req.user});
+  })
+  .catch((err)=>{
+      console.log(err);
+  });
+});
+
+app.get("/allhotels/:hotelId",function(req,res){
+  const id= req.params.hotelId;
+
+  Hotel.findById(id)
+  .then((foundHotel)=>{
+      res.render("hotel",{hotel : foundHotel, user:req.user});
+  })
+  .catch((err)=>{
+      console.log(err);
+  });
+});
+
+
+
+app.get("/newhotel",function(req,res){
+  res.render("newhotel", {user:req.user});
+});
+
+app.post("/newhotel",function(req,res){
+  const newHotelName = req.body.hotelName;
+  const newHotelLocation = req.body.hotelLocation;
+  const newHotelDescription = req.body.hotelDescription;
+  const newHotelAmenities = req.body.hotelAmenities;
+  const newHotelPricePerNight = req.body.pricePerNight;
+  const newHotelRating = req.body.hotelRating;
+  const newFirstImgLink = req.body.firstImg;
+  const newFirstPara = req.body.firstPara;
+  const newImageLink = req.body.imageLink;
+  const newAvailableRooms = req.body.availableRooms;
+  const newTotalRooms = req.body.totalRooms;
+
+  const newHotel = new Hotel({
+      name : newHotelName,
+      location : newHotelLocation,
+      description : newHotelDescription,
+      firstImg : newFirstImgLink,
+      firstPara : newFirstPara,
+      amenities: newHotelAmenities,
+      pricePerNight : newHotelPricePerNight,
+      rating : newHotelRating,
+      availableRooms : newAvailableRooms,
+      totalRooms : newTotalRooms
+  });
+  
+  if (newImageLink) {
+      newHotel.images = [req.body.imageLink];
+    }
+  newHotel.save();
+  res.redirect("/allhotels");
+});
+
+// GET route for searching
+// GET route for searching
+app.get("/allhotels/search/:location", function(req, res) {
+  const searchedLocation = req.params.location;
+  const lowercaseSearchTitle = _.lowerCase(searchedName);
+
+  Hotel.find({ location: { $regex: `.*${searchedLocation}.*`, $options: 'i' } })
+    .then((hotels) => {
+      if (hotels.length > 0) {
+        res.render("hotelsearch", { searchResults: hotels, user: req.user, message : "" });
+      } else {
+        res.render("hotelsearch", { searchResults: [], user: req.user, message : "Nothing Found" });
+      }
+    })
+    .catch((err) => {
+      console.error('Something went wrong', err);
+      res.render("hotelsearch", { searchResults: [], user: req.user });
+    });
+});
+
+
+// POST route for form submission
+app.post("/allhotels/search", function(req, res) {
+  const searchQuery = req.body.searchTerm;
+  res.redirect("/allhotels/search/"+searchQuery);
+});
+
+
+//Routes for editing and deleting hotel by admin
+
+
+app.get("/allhotels/:hotelId/edit", isAuthenticated, function(req, res) {
+  const hotelID = req.params.hotelId;
+
+  Hotel.findOne({ _id: hotelID })
+    .exec()
+    .then((foundHotel) => {
+      if (foundHotel) {
+        res.render("edithotel", { foundHotel: foundHotel, user: req.user });
+      } else {
+        console.log("Hotel not found");
+        res.redirect("/");
+      }
+    })
+    .catch((err) => {
+      console.log(`Error Occurred: ${err}`);
+      res.redirect("/");
+    });
+});
+
+app.post("/allhotels/:hotelId/edit", isAuthenticated, function (req, res) {
+  const hotelID = req.params.hotelId;
+  const updatedName = req.body.updatedName;
+  const updatedFirstPara = req.body.updatedFirstPara;
+  const updatedFirstImg = req.body.updatedfirstImg; // Updated this line
+  const updatedDescription = req.body.updatedDescription;
+  const updatedLocation = req.body.updatedLocation;
+  const updatedAmenities = req.body.updatedAmenities;
+  const updatedPricePerNight = req.body.updatedPricePerNight;
+  const updatedRating = req.body.updatedRating;
+  const updatedAvailableRooms = req.body.updatedAvailableRooms;
+  const updatedTotalRooms = req.body.updatedTotalRooms;
+  const images = req.body.images;
+
+  const update = {
+    name: updatedName,
+    description: updatedDescription,
+    firstPara: updatedFirstPara,
+    firstImg: updatedFirstImg, // Updated this line
+    location : updatedLocation,
+    pricePerNight : updatedPricePerNight,
+    rating : updatedRating,
+    availableRooms : updatedAvailableRooms,
+    totalRooms : updatedTotalRooms
+  };
+  if (images) {
+    update.$addToSet = { images: images }; // Add the images to the images array
+  }
+  if (updatedAmenities) {
+    update.$addToSet = { amenities: updatedAmenities };
+  }
+
+  Hotel.findByIdAndUpdate(hotelID, update, { new: true })
+    .then((updatedHotel) => {
+      if (updatedHotel) {
+        res.redirect(`/allhotels/${hotelID}`);
+      } else {
+        console.log("Hotel not found");
+        res.redirect("/");
+      }
+    })
+    .catch((err) => {
+      console.log(`Error Occurred: ${err}`);
+      res.redirect("/");
+    });
+});
+
+
+// Delete Post
+app.post("/allhotels/:hotelId/delete", isAuthenticated, function(req, res) {
+const hotelID = req.params.hotelId;
+
+Hotel.findByIdAndRemove(hotelID)
+  .then(() => {
+    res.redirect("/");
+  })
+  .catch((err) => {
+    console.log(`Error Occurred: ${err}`);
+    res.redirect("/");
+  });
+});
+
+
+
+
+// Remove Image from Post
+// Remove Image from Post
+app.post("/allhotels/:hotelId/delete-image", isAuthenticated, function(req, res) {
+  const hotelID = req.params.hotelId;
+  const images = req.body.images;
+
+  Hotel.findByIdAndUpdate(
+    hotelID,
+    { $pull: { images: images} }, // Remove the imageURL from the images array
+    { new: true }
+  )
+    .then((updatedHotel) => {
+      if (updatedHotel) {
+        res.redirect(`/allhotels/${hotelID}/edit`);
+      } else {
+        console.log("Hotel not found");
+        res.redirect("/");
+      }
+    })
+    .catch((err) => {
+      console.log(`Error Occurred: ${err}`);
+      res.redirect("/");
+    });
+});
+
+app.post("/allhotels/:hotelId/delete-amenity", isAuthenticated, async function(req, res) {
+  try {
+    const hotelID = req.params.hotelId;
+    const amenityToDelete = req.body.amenity;
+
+    // Delete the amenity from the hotel's amenities array
+    await Hotel.findByIdAndUpdate(hotelID, { $pull: { amenities: amenityToDelete } });
+
+    res.redirect(`/allhotels/${hotelID}/edit`);
+  } catch (err) {
+    console.log(err);
+    res.redirect("/");
+  }
+});
+
+
+//Routes for hotel booking
+
+app.get("/allhotels/:hotelId/bookhotel", isAuthenticated, async function(req, res) {
+  try {
+    const hotelId = req.params.hotelId;
+    const hotel = await Hotel.findById(hotelId);
+
+    res.render("bookhotel", { hotelId: hotelId, user: req.user, availableRooms: hotel.availableRooms });
+  } catch (err) {
+    console.log(err);
+    res.redirect("/allhotels");
+  }
+});
+
+var roomsNumber = 0;
+
+app.post("/allhotels/:hotelId/bookhotel", isAuthenticated, async function(req, res) {
+  try {
+    const hotelId = req.params.hotelId;
+    roomsNumber = 0;
+    const { Name, mobile, checkInDate, checkOutDate, numberOfMembers, numberOfRooms, email } = req.body;
+    const hotel = await Hotel.findById(hotelId);
+
+    if (hotel.availableRooms > 0) {
+      const booking = {
+        customerName: Name,
+        mobile : mobile,
+        email : email,
+        numberOfMembers : numberOfMembers,
+        occupiedRooms : numberOfRooms,
+        checkInDate : checkInDate,
+        checkOutDate : checkOutDate,
+        hotel: hotel._id,
+        hotelName : hotel.name,
+        location: hotel.location,
+        rating: hotel.rating,
+        pricePerNight: hotel.pricePerNight,
+        availableRooms: hotel.availableRooms,
+        amenities: hotel.amenities.join(", ")
+      };
+
+      roomsNumber = numberOfRooms;
+      
+      await User.findByIdAndUpdate(req.user._id, { $push: { bookedHotels: booking } });
+      console.log(numberOfRooms);
+      hotel.availableRooms -= numberOfRooms;
+      await hotel.save();
+
+      console.log("Hotel booked successfully");
+
+     // Generate PDF ticket
+    const doc = new PDFDocument();
+    const ticketPath = `hotel booking for ${booking.customerName}.pdf`;
+    const stream = fs.createWriteStream(ticketPath);
+
+    doc.pipe(stream);
+    doc.fontSize(20).text("Hotel Booking Confirmation Ticket");
+    doc.fontSize(12).text(`Name: ${booking.customerName}`);
+    doc.fontSize(12).text(`Mobile Number: ${booking.mobile}`);
+    doc.fontSize(12).text(`Number of Members : ${booking.numberOfMembers}`);
+    doc.fontSize(12).text(`Number of Rooms Booked : ${numberOfRooms}`);
+    doc.fontSize(12).text(`Hotel Name: ${booking.hotelName}`);
+    doc.fontSize(12).text(`Check In Date : ${booking.checkInDate}`);
+    doc.fontSize(12).text(`Check Out Date : ${booking.checkOutDate}`);
+    doc.fontSize(12).text(`Hotel Location: ${booking.location}`);
+    doc.fontSize(12).text(`Hotel Price Per Night: ${booking.pricePerNight}`);
+    doc.fontSize(12).text(`Total Available Rooms: ${booking.availableRooms}`);
+    doc.fontSize(12).text(`Hotel Rating : ${booking.rating}`);
+    // Display amenities as an unordered list
+    doc.fontSize(12).text("Hotel Amenities:");
+    doc.list(booking.amenities.split(", "), {
+      bulletRadius: 2,
+      textIndent: 10,
+      bulletIndent: 5,
+      lineGap: 2
+    });
+    doc.fontSize(20).text("Thank You for choosing our hotel. Hope you have a great experience");
+    doc.end();
+
+    // Set the ticketPath in the bookedFlight object
+    booking.ticketPath = ticketPath;
+    await User.findOneAndUpdate(
+      { _id: req.user._id, "bookedHotels.hotel": booking.hotel },
+      { $set: { "bookedHotels.$.ticketPath": ticketPath } }
+    );
+
+    // Trigger the download of the PDF ticket
+    res.setHeader('Content-disposition', `attachment; filename=${ticketPath}`);
+    res.setHeader('Content-type', 'application/pdf');
+    fs.createReadStream(ticketPath).pipe(res);
+
+    } else {
+      console.log("No available rooms for the selected hotel");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  res.redirect("/allhotels/" + req.params.hotelId);
+});
+
+//Route for cancelling the booked flight.
+
+app.post("/allhotels/:hotelId/cancelbooking/:bookingId", isAuthenticated, async function(req, res) {
+  try {
+    const hotelId = req.params.hotelId;
+    const bookingId = req.params.bookingId;
+
+    const hotel = await Hotel.findById(hotelId);
+    // Remove the booking from the user's bookedHotels array
+    await User.findByIdAndUpdate(req.user._id, { $pull: { bookedHotels: { _id: bookingId } } });
+
+    // Find the specific hotel in the bookedHotels array using hotelId
+    const bookedHotel = req.user.bookedHotels.find((hotel) => hotel._id.toString() === bookingId);
+    if (bookedHotel) {
+      const usedRooms = bookedHotel.occupiedRooms;
+      // Increase the available rooms for the canceled hotel booking
+      hotel.availableRooms += parseInt(usedRooms, 10);
+      await hotel.save();
+
+      console.log("Hotel Booking canceled successfully");
+    } else {
+      console.log("Hotel Booking not found in user's bookings.");
+    }
+
+    res.redirect(`/allhotels/${hotelId}`);
+  } catch (err) {
+    console.log(err);
+    res.redirect(`/allhotels`);
+  }
+});
+
+
+
+
+
 app.get("/about", function(req, res) {
     res.render("about", {user:req.user});
 });
@@ -953,6 +1462,40 @@ app.get("/contact",function(req,res){
     res.render("contact", {user:req.user});
 });
 
+app.post("/contact", function(req, res) {
+  const title = req.body.title;
+  const content = req.body.content;
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // Create a Nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: email, // Use the provided email as the 'from' address
+      pass: password // Replace with your email password
+    }
+  });
+
+  // Compose the email message
+  const mailOptions = {
+    from: email, // Use the provided email as the 'from' address
+    to: process.env.EMAIL, // Replace with your email address
+    subject: `Title: ${title}`,
+    text: `Content: ${content}`
+  };
+
+  // Send the email
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      console.log(error);
+      res.redirect("/contact"); // Handle error
+    } else {
+      console.log("Email sent: " + info.response);
+      res.redirect("/"); // Redirect to homepage after successful submission
+    }
+  });
+});
 
 app.listen(3000, function() {
     console.log("Server started on port 3000");
