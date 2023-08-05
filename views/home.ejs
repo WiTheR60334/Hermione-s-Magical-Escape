@@ -100,7 +100,7 @@
 
     <div class="icons3">
         <input data-aos="zoom-in" data-aos-delay="100" type="submit" value="flights" class="btnn">
-        <input data-aos="zoom-in" data-aos-delay="200" type="submit" value="hotels" class="btnn2">
+        <!-- <input data-aos="zoom-in" data-aos-delay="200" type="submit" value="hotels" class="btnn2"> -->
         <div class="links">
             <p  data-aos="fade-up" data-aos-delay="100" id="link1" name="tripType" value="one-way">One Way</p>
             <p  data-aos="fade-up" data-aos-delay="200" id="link2" name="tripType" value="round-trip">Round Trip</p>     
@@ -165,14 +165,15 @@
                 </div>
                 <div class="return">
                     <span>Return Date</span><br>
-                    <input type="date" id="date1" name="arrivalDate" value="">    
+                    <input type="date" id="date1" name="returnDate" value="">    
                 </div>
             </div>
         </div>
         <div class="passengers"  data-aos="fade-up" data-aos-delay="400">
             <div class="box">
                 <span>Passengers, Class</span><br>
-                <p id="click" name="adults" >1</p>
+                <p id="click" name="adults">1</p>
+                <input id="inputAdults" type="" name="adults" value="click" hidden>
                 <span class="selectedOption">Business</span>
             </div>
         </div>
@@ -758,17 +759,15 @@ const linksContainer = document.querySelector('.links');
 const links = linksContainer.querySelectorAll('p');
 
 function handleLinkClick(event) {
-  if (event.target.tagName !== 'P') return; // Ignore clicks on non-<p> elements
+  if (event.target.tagName !== 'P') return; 
 
   links.forEach(link => {
     if (link === event.target) {
       console.log('Button Clicked!');
       link.classList.add('selected');
       if (link.id === 'link1') {
-        // Hide the return date input
         document.querySelector('.return').style.visibility = 'hidden';
       } else {
-        // Show the return date input
         document.querySelector('.return').style.visibility = 'visible';
       }
     } else {
@@ -777,10 +776,16 @@ function handleLinkClick(event) {
   });
 }
 
-linksContainer.addEventListener('click', handleLinkClick);
-
-// Set the "One Way" link as selected by default
-document.getElementById('link2').classList.add('selected');
-// Hide the return date input by default
-document.querySelector('.return').style.visibility = 'visible';
+    linksContainer.addEventListener('click', handleLinkClick);
+    
+    document.getElementById('link2').classList.add('selected');
+    document.querySelector('.return').style.visibility = 'visible';
+    
+    const inputAdultsElement = document.getElementById('inputAdults');
+    
+    inputAdultsElement.value = clickElement.textContent;
+    
+    clickElement.addEventListener('input', () => {
+      inputAdultsElement.value = clickElement.textContent;
+    });
   </script>

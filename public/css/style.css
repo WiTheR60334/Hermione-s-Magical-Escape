@@ -3665,7 +3665,7 @@ input.form-control {
 
 
 .fl-hotel {
-  width: 72%;
+  width: 75%;
   margin: 1rem auto;
   background: var(--bgcolor2);
   position: relative;
@@ -3766,6 +3766,7 @@ input.form-control {
   display: flex;
   flex-wrap: wrap;
   margin-top: -3.5rem;
+  justify-content: space-between;
 }
 
 #date1{
@@ -3911,6 +3912,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .links p.selected {
   color: yellow;
+}
+#inputAdults{
+  background: none;
+  color: var(--bordercolor);
+  font-size: 1.8rem;
 }
 
 

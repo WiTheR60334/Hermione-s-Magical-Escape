@@ -208,7 +208,7 @@ const usersSchema = new mongoose.Schema({
   // Define the schedule schema
 const scheduleSchema = new mongoose.Schema({
     departureDate: {
-      type: mongoose.Schema.Types.DateOnly,
+      type: Date,
       required: true,
     },
     departureTime: {
@@ -216,7 +216,7 @@ const scheduleSchema = new mongoose.Schema({
       required: true,
     },
     arrivalDate: {
-      type: mongoose.Schema.Types.DateOnly,
+      type: Date,
       required: true,
     },
     arrivalTime: {
@@ -484,6 +484,41 @@ app.get("/", async function(req, res) {
   }
 });
 
+
+app.post("/allflights/home/search", async function(req, res) {
+  try {
+    const departure = req.body.departure;
+    const arrival = req.body.arrival;
+    const departureDate = req.body.departureDate;
+    const adults = parseInt(req.body.adults);
+    console.log(adults);
+    const totalPassengers = adults;
+    const returnDate = req.body.returnDate;
+
+    const departureToArrivalFlights = await Flight.find({
+      departure: departure,
+      arrival: arrival,
+      "schedule.departureDate": departureDate,
+      "schedule.availableSeats": { $gte: totalPassengers }
+    });
+
+    const returnFlights = await Flight.find({
+      departure: arrival,
+      arrival: departure,
+      "schedule.departureDate": returnDate,
+      "schedule.availableSeats": { $gte: totalPassengers }
+    });
+
+    res.render("flightsearch", {
+      departureToArrivalFlights: departureToArrivalFlights,
+      returnFlights: returnFlights,
+      user: req.user
+    });
+  } catch (err) {
+    console.log(err);
+    res.redirect("/");
+  }
+});
 
 // User Sign Up
 app.get("/signup", function(req, res) {
