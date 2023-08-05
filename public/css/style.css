@@ -3383,15 +3383,16 @@ background: var(--bordercolor);
 
   .header .search-form {
     position: absolute;
-    top: 130%;
+    top: 130%;right: 1rem;
     border-radius: 1rem;
-    width: 85%;
-    text-align: center;
+    width: 90%;
+    /* text-align: center;
     justify-content: center;
-    align-items: center;
-    transform-origin: top right;
+    align-items: center; */
+    /* transform-origin: top right; */
     transform: scale(0);
-    margin-left: 1rem;
+    /* margin-left: 1rem; */
+    margin-right: 1rem;
   }
 
   #search-btn {
