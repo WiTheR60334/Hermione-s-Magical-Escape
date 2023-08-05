@@ -233,7 +233,7 @@
                             <h3><i class="fas fa-map-marker-alt"></i><%= destination.title %></h3>
                         </div>
                         <div class="content">
-                            <div class="price">₹ 999 <span>1499</span></div>
+                            <div class="price">$ 999 <span>1499</span></div>
                             <p><%= destination.firstPara %></p>
                             <a href="/alldestinations/<%= destination._id %>">Read More <i class="fas fa-angle-right"></i></a>
                         </div>
@@ -329,7 +329,7 @@
               <h3><i class="fas fa-map-marker-alt"></i><%= destination.title %></h3>
             </div>
             <div class="content">
-              <div class="price">₹ 999 <span>1499</span></div>   
+              <div class="price">$ 999 <span>1499</span></div>   
               <p><%= destination.firstPara %></p>
               <a href="/alldestinations/<%= destination._id %>">Read More <i class="fas fa-angle-right"></i></a>
             </div>
@@ -353,8 +353,8 @@
         <div class="box" data-aos="fade-up" data-aos-delay="150">
             <h3>Basic Plan</h3>
             <div class="price">
-                <span>₹</span>
-                <span class="amount">20,000</span>
+                <span>$</span>
+                <span class="amount">250</span>
                 <span>/mo</span>
             </div>
             <ul>
@@ -370,8 +370,8 @@
         <div class="box" data-aos="fade-up" data-aos-delay="300">
             <h3>Standard Plan</h3>
             <div class="price">
-                <span>₹</span>
-                <span class="amount">35,000</span>
+                <span>$</span>
+                <span class="amount">365</span>
                 <span>/mo</span>
             </div>
             <ul>
@@ -387,8 +387,8 @@
         <div class="box" data-aos="fade-up" data-aos-delay="450">
             <h3>Premium Plan</h3>
             <div class="price">
-                <span>₹</span>
-                <span class="amount">50,000</span>
+                <span>$</span>
+                <span class="amount">600</span>
                 <span>/mo</span>
             </div>
             <ul>
@@ -420,7 +420,7 @@
               <h3><i class="fas fa-map-marker-alt"></i><%= hotel.name %></h3>
             </div>
             <div class="content">
-              <div class="price">₹ <%= hotel.pricePerNight %> <span>1499</span></div>   
+              <div class="price">$ <%= hotel.pricePerNight %> <span><%= parseInt(hotel.pricePerNight) + 200 %></span></div>   
               <p><%= hotel.firstPara %></p>
               <a href="/allhotels/<%= hotel._id %>">Read More <i class="fas fa-angle-right"></i></a>
             </div>
