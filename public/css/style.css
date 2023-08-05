@@ -1207,6 +1207,9 @@ background: var(--bordercolor);
   grid-template-columns: repeat(auto-fit, minmax(34rem, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
+  @media (max-width:768px) {
+    margin: 1rem;
+  }
 }
 
 .destination .box-container .box {
@@ -3732,7 +3735,7 @@ input.form-control {
   display: flex;
 }
 .fl-hotel .box{
-  margin-top: 4rem;
+  margin-top: 5rem;
   border-radius: 1rem;
   overflow: hidden;
   width: 100%;
@@ -3960,8 +3963,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-top: 7rem;
     text-align: center;
   }
-
-  
+  #date1{
+    font-size: 1.5rem;
+  }
   
   .details2 {
     margin: 1rem;
@@ -3987,10 +3991,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
   
   .dropdown1 {
-    /* Adjust position for smaller screens */
-    bottom: 100%; /* Position the dropdown above the element */
-    right: 0; /* Align the dropdown with the right edge of the container */
-    margin-top: 1rem; /* Add some spacing from the previous element */
+    position: absolute;
+    top: 184%;
+    right: 30%;
+    z-index: 999;
+  }
+  .journey-date span{
+    font-size: 1rem;
   }
 }
 
