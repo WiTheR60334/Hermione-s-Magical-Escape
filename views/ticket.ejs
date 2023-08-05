@@ -25,7 +25,7 @@
     .btn:hover {
       color: #000;
     }
-
+    
   </style>
   <a class="btn" href="/download-ticket">Download Ticket</a>
 <a class="btn" href="/">Back To Home</a>
@@ -75,9 +75,15 @@
             
           </tr>
           <tr>
-              <td style="font-size: 17px; font-weight: bolder; padding: 15px;border-bottom: 2.5px solid #c4c1c1;  width: 25%;">
-                Passenger Name : <span style="color: #00000071;"><%= user.name %></span>
-              </td>
+            <td style="font-size: 17px; font-weight: bolder; padding: 15px; border-bottom: 2.5px solid #c4c1c1; width: 25%;">
+              Passenger Name :
+              <% if (user.googleId) { %>
+                <span style="color: #00000071;"><%= user.googleDisplayName %></span>
+              <% } else { %>
+                <span style="color: #00000071;"><%= user.name %></span>
+              <% } %>
+            </td>
+            
               <td style="font-size: 17px;font-weight: bolder; padding: 15px;border-bottom: 2.5px solid #c4c1c1;  border-left: 1px solid #c4c1c1; width: 25%;">
                 Payment Gateway : <span style="color: #00000071;">PayPal</span>
               </td>
@@ -167,7 +173,7 @@
               <p style="font-weight: 700; margin: 0;">Convenience Fee</p>
             </td>
             <td style="font-size: 17px; padding: 15px 0 0; text-align: center; border-left: 1px solid #ccc; border-top: 0px solid #ccc;">
-              $ <%= flight.price %>
+              $<%= flight.price %>
             </td>
           </tr>
           <!--Conv Fee End-->
@@ -222,7 +228,7 @@
               <p style="font-weight: 700; margin: 0;">GRAND TOTAL</p>
             </td>
             <td style="font-size: 17px; margin-top: 15px; padding: 15px 0; text-align: center; border-left: 1px solid #ccc; border-top: 1px solid #ccc;">
-              <%= flight.price %>
+              $<%= flight.price %>
             </td>
           </tr>
           <!--Grand Total End-->
@@ -232,3 +238,119 @@
 
 <%- include("partials/newfooter.ejs"); -%>
 
+
+
+<!-- Code to generate Ticket for the user -->
+
+  <section class="tickett" >
+      <h2 style="color: white; font-size : 30px; text-align : center; margin-bottom : 50px;">My Booked Flight Ticket</h2>
+      
+          <div class="ticket">
+          <div id="barBig">
+              <!-- <img src="https://www.incimages.com/uploaded_files/image/1024x576/*Barcode_32896.jpg" alt="Bar Code"> -->
+          </div>
+          <div class="mainInfo" id="mainInfo">
+              <div class="passenger-info-container">
+                  <div class="passenger-info">
+                      <span>Name of Passenger</span>
+                      <% if (user.googleId) { %>
+                        <span class="details"><%= user.googleDisplayName %></span>
+                      <% } else { %>
+                        <span class="details"><%= user.name %></span>
+                      <% } %>
+                  </div>
+                  <div class="passenger-info">
+                      <span>Flight</span>
+                      <span class="details">FL006</span>
+                  </div>
+                  <div class="passenger-info">
+                      <span>Date</span>
+                      <span class="details"><%= flight.schedule[0].departureDate %></span>
+                  </div>
+                  <div class="passenger-info">
+                      <span>Seat</span>
+                      <span class="details">8C</span>
+                  </div>
+              </div>
+              <h1 class="destination1">
+                  <%= flight.departure %>
+                  <img src="https://i.pinimg.com/originals/e9/0a/29/e90a299a041b7d37cdafc6eb2905e9d6.png" alt="Destination">
+                  <%= flight.arrival %>
+              </h1>
+              <div class="flight-info-container">
+                  <div class="flight-info">
+                      <span>Gate</span>
+                      <span>D 12</span>
+                  </div>
+                  <div class="flight-info">
+                      <span>Boarding Time</span>
+                      <span><%=flight.schedule[0].departureTime %> IST</span>
+                  </div>
+                  <div class="flight-info">
+                      <span>ETD</span>
+                      <span><%= flight.schedule[0].departureTime %> IST</span>
+                  </div>
+                  <div class="flight-info">
+                      <span>ETA</span>
+                      <span><%= flight.schedule[0].arrivalTime %> IST</span>
+                  </div>
+              </div>
+              <p class="note">Gate closes 20 minutes before departure</p>
+          </div>
+          <div id="circles">
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+              <div class="circle"></div>
+          </div>
+          <div id="sideInfo">
+              <img src="https://www.incimages.com/uploaded_files/image/1024x576/*Barcode_32896.jpg" alt="Small Bar" id="barSmall">
+              <div class="details-container">
+                  <div class="flight-details">
+                      <div>
+                          <span>Name of Passenger</span>
+                          <% if (user.googleId) { %>
+                            <span><%= user.googleDisplayName %></span>
+                          <% } else { %>
+                            <span><%= user.name %></span>
+                          <% } %>
+                      </div>
+                      <div>
+                          <span>Flight</span>
+                          <span>FL006</span>
+                      </div>
+                      <div>
+                          <span>Date</span>
+                          <span><%= flight.schedule[0].departureDate %></span>
+                      </div>
+                      <div>
+                          <span>Seat</span>
+                          <span>8C</span>
+                      </div>
+                  </div>
+                  <div class="destination-details">
+                      <%= flight.arrival %>
+                      <img src="https://i.pinimg.com/originals/e9/0a/29/e90a299a041b7d37cdafc6eb2905e9d6.png" alt="Destination">
+                      <%= flight.departure %>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+  </section>
