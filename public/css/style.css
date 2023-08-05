@@ -14,6 +14,14 @@
   scroll-behavior: smooth;
 }
 
+@font-face {
+  font-family: 'Harry Potter Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Harry Potter Regular'), url('HARRP___.woff') format('woff');
+  }
+
+
 :root {
   --orange: #F79F1F;
   --bgcolor1: #111;
@@ -608,17 +616,30 @@ section {
 }
 
 .images .tp{
-  margin-top: 29rem;
+  margin-top: 31rem;
 }
-
+/* #h11{
+  margin-top: -5rem;
+  display: block;
+  color: var(--textcolor1);
+  font-size: 5vw;
+  font-style: normal;
+  font-weight: normal;
+} */
 .images span,
 .home .content span {
-  margin-top: -5rem;
+  /* margin-top: -5rem;
   font-weight: bolder;
   color: transparent;
   -webkit-text-stroke: 0.3rem #08FF08;
   font-size: 5vw;
+  display: block; */
+  margin-top: -5rem;
   display: block;
+  color: var(--textcolor1);
+  font-size: 5vw;
+  font-style: normal;
+  font-weight: normal;
 }
 
 @media (max-width: 768px) {
@@ -632,6 +653,10 @@ section {
 .home .content h3 {
   font-size: 6vw;
   color: #fff;
+  font-family: 'Harry Potter Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Harry Potter Regular'), url('HARRP___.woff') format('woff');
 }
 
 @media (max-width: 768px) {
@@ -642,11 +667,12 @@ section {
 }
 
 .images p{
+  font-family: 'Harry Potter Regular';
+  src: local('Harry Potter Regular'), url('HARRP___.woff') format('woff');
   text-align: center;
   /* max-width: 60rem; */
   margin: 1rem auto;
-  font-size: 1.8rem;
-  font-weight: bolder;
+  font-size: 3.5rem;
   color: white;
   line-height: 2;
 }
@@ -3632,3 +3658,356 @@ input.form-control {
 	margin-right: 10px;
 	margin-left: 10px;
 }
+
+
+
+
+
+
+.fl-hotel {
+  width: 72%;
+  margin: 1rem auto;
+  background: var(--bgcolor2);
+  position: relative;
+  /* z-index: 1; */
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  margin-top: -10rem;
+}
+
+.btnn{
+  border-radius: 3rem;
+  background: none;
+  border: .1rem solid var(--bordercolor);
+  font-size: 1.5rem;
+  padding: 1rem 2rem;
+  color: var(--textcolor1);
+}
+.btnn2{
+  margin-left: 2rem;
+  border-radius: 3rem;
+  background: none;
+  border: .1rem solid var(--bordercolor);
+  font-size: 1.5rem;
+  padding: 1rem 2rem;
+  color: var(--textcolor1);
+}
+.icons3{
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.fl-hotel .links{
+  margin-top: -2rem;
+}
+#link2{
+  position: absolute;
+  right: 2rem;
+  font-size: 1.5rem;
+}
+#link1{
+  position: absolute;
+  right: 15rem;
+  font-size: 1.5rem;
+}
+.from1{
+  margin-top: 2rem;
+}
+.passengers,
+.journey-date,
+.where1{
+  margin-top: 2rem;
+  margin-left: 4rem;
+}
+.journey-date .box{
+  margin-top: 4rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  width: 100%;
+  background: var(--bgcolor1);
+  padding: 1.5rem;
+  position: relative;
+  display: flex;
+}
+.fl-hotel .box{
+  margin-top: 4rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  width: 100%;
+  background: var(--bgcolor1);
+  padding: 1.5rem;
+  position: relative;
+}
+.fl-hotel .box span{
+  color: var(--bordercolor);
+  font-size: 1.5rem;
+  margin-left: 2rem;
+  margin-top: 1.5rem;
+}
+
+.fl-hotel .box #from-select{
+  margin-left: 1.5rem;
+  margin-top: 3rem;
+  font-size: 2rem;
+  background: none;
+  color: var(--bordercolor);
+}
+
+#plane1{
+  position: fixed;
+  right: 2rem;
+  font-size: 2.7rem;
+  color: var(--bordercolor);
+}
+
+.details2{
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: -3.5rem;
+}
+
+#date1{
+  margin-top: 2.75rem;
+  margin-left: 1.7rem;
+  background: none;
+  color: var(--bordercolor);
+  font-size: 2rem;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%) sepia(0%) saturate(10000%) hue-rotate(150deg) brightness(100%) contrast(100%);
+  color: var(--bordercolor); /* Change the color to the desired color */
+}
+
+.journey-date .return{
+  margin-left: 2rem;
+  /* visibility: hidden; */
+}
+.passengers p{
+  font-size: 2.5rem;
+  color: var(--bordercolor);
+  margin-left: 2rem;
+  margin-top: .5rem;
+  margin-bottom: -.5rem;
+}
+
+#link1:hover,
+#link2:hover{
+  color: yellow;
+}
+.links p{
+  cursor: pointer;
+  color: var(--bordercolor);
+}
+.btnn:hover,
+.btnn2:hover{
+  color: var(--bgcolor1);
+  background: var(--bordercolor);
+}
+.dropdown1 .box h3 {
+  padding: 1rem;
+  background: var(--bgcolor1);
+  font-size: 3rem;
+  border-radius: 1rem;
+  color: var(--textcolor1);
+}
+.cabinClass p:hover {
+  color: yellow;
+  /* background: var(--bgcolor1); */
+  padding-left: 2rem;
+}
+.dropdown1{
+  position: absolute;
+  top: 118%;
+  right: 11%;
+  z-index: 999;
+  /* display: flex; */
+  flex-direction: column;
+  background: var(--bgcolor2);
+  border-radius: 1rem;
+  width: 25rem;
+  transform-origin: top right;
+  /* border: .1rem solid var(--orange); */
+}
+#huge{
+  font-size: 2rem;
+  font-weight: bold;
+  background: var(--bgcolor1);
+  border-radius: 1rem;
+  text-align: center;
+  /* border-bottom: .1rem solid var(--bordercolor); */
+  /* padding-bottom: 1rem; */
+}
+.dropdown1 span{
+  color: var(--bordercolor);
+  font-size: 1.8rem;
+  margin-left: 2rem;
+  margin-top: 1.5rem;
+}
+.dropdown1 p{
+  color: var(--bordercolor);
+  font-size: 1.8rem;
+  margin-left: 2rem;
+  margin-top: 1.5rem;
+}
+.plus-minus{
+  display: flex;
+  align-items: center;
+  margin: 1rem;
+  color: var(--bordercolor);
+  gap: 1rem;
+}
+#childrenPlus,
+#childrenMinus,
+#adultPlus,
+#adultMinus{
+  font-size: 2rem;
+  background: var(--bgcolor1);
+  color: var(--bordercolor);
+  padding: .5rem .5rem;
+  border-radius: .6rem;
+}
+#childrenPlus:hover,
+#childrenMinus:hover,
+#adultPlus:hover,
+#adultMinus:hover{
+  transform: scale(.9);
+}
+.flex-container2{
+  display: flex;
+  margin-top: -1rem;
+  justify-content: space-between;
+
+}
+.flex-container {
+  display: flex;
+  margin-top: 1rem;
+  justify-content: space-between;
+}
+.cabinClass{
+  display: flex;
+  flex-direction: column;
+}
+.cabinClass p {
+  margin: 0;
+  padding: 1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+.cabinClass p:not(:last-child) {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+.cabinOption.selected{
+  color: yellow;
+}
+.dropdown1 {
+  display: none;
+}
+.dropdown1.active {
+  display: block;
+}
+.links p.selected {
+  color: yellow;
+}
+
+
+
+
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .fl-hotel {
+    width: 80%; /* Adjust width for smaller screens */
+    padding: 2rem 1rem; /* Adjust padding for smaller screens */
+    margin-top: 0; /* Remove negative margin-top */
+  }
+  .details2{
+    flex-wrap: nowrap;
+  }
+  .passengers,
+  .journey-date,
+  .where1{
+    margin: 0;
+  }   
+  
+  .icons3 {
+    flex-wrap: wrap;
+    margin-bottom: 1rem; 
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+  }
+
+  #link1,
+  #link2 {
+    display: block;
+    margin: 1rem auto; /* Center the anchor tags vertically and horizontally */
+    text-align: center;
+    margin-right: 8rem;
+  }
+
+  .icons3 .links{
+    flex-direction: column;
+    margin-top: 7rem;
+    text-align: center;
+  }
+
+  
+  
+  .details2 {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically on smaller screens */
+  }
+  
+  .fl-hotel .box {
+    width: 100%; /* Adjust width to fill the container on smaller screens */
+    margin-bottom: 2rem; /* Add some spacing between boxes */
+  }
+  
+  #plane1 {
+    right: 1rem; /* Adjust right position for smaller screens */
+  }
+  
+  .journey-date .return {
+    margin-left: 0; /* Reset margin for smaller screens */
+  }
+  
+  .passengers p {
+    font-size: 2rem; /* Adjust font size for smaller screens */
+  }
+  
+  .dropdown1 {
+    /* Adjust position for smaller screens */
+    bottom: 100%; /* Position the dropdown above the element */
+    right: 0; /* Align the dropdown with the right edge of the container */
+    margin-top: 1rem; /* Add some spacing from the previous element */
+  }
+}
+
+.images span,
+.home .content span {
+  font-family: 'Harry Potter Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Harry Potter Regular'), url('HARRP___.woff') format('woff');
+  /* margin-top: -5rem;
+  font-weight: bolder;
+  color: transparent;
+  -webkit-text-stroke: 0.3rem #08FF08;
+  font-size: 5vw;
+  display: block; */
+  margin-top: -5rem;
+  display: block;
+  color: #08FF08;
+  font-size: 8.5rem;
+}
+
+
+
+ 
+
+

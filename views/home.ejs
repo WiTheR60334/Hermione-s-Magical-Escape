@@ -3,15 +3,17 @@
 
 <section class="parallax">
     <div class="images">
-        <img src="../images/BackDrop.png" id="background" alt="">
+        <img src="../images/BackDrop-PhotoRoom-PhotoRoom.png" id="background" alt="">
         <div class="tp">
             <!-- <a data-aos="fade-up" data-aos-delay="600" href="/allflights" class="btn">Book Now</a> -->
             <% if(user && user.role === "user") { %>
                 <% if(user.googleId) { %>
-                  <span id="text1" data-aos="fade-up" data-aos-delay="300">Welcome, <%= user.googleDisplayName %></span>
+                  <span id="text1" style="font-family:'Harry Potter Regular';font-weight:normal;" data-aos="fade-up" data-aos-delay="300">Welcome, <%= user.googleDisplayName %></span>
+
                 <% } else { %>
+                  <!-- <span id="text1" data-aos="fade-up" data-aos-delay="300">Welcome, <%= user.name %></span> -->
                   <span id="text1" data-aos="fade-up" data-aos-delay="300">Welcome, <%= user.name %></span>
-                <% } %>
+                  <% } %>
                 <p id="text2" data-aos="fade-up" data-aos-delay="400" style="display: block;">Enter the realm of enchantment and seek wisdom in our magical conversation.</p>
               <% } else if(user && user.role === "admin") { %>
                 <span id="text1" data-aos="fade-up" data-aos-delay="300">Welcome, Admin</span>
@@ -28,7 +30,7 @@
 </section>
 
 
-<section class="book-form" id="book-form">
+<!-- <section class="book-form" id="book-form">
     <form action="/allflights/search" method="post">
         <div data-aos="zoom-in" data-aos-delay="150" class="inputBox">
         <span>From :</span>
@@ -86,16 +88,138 @@
             <input type="number" placeholder="number of travelers" name="children" value="">
         </div>
         <input data-aos="zoom-in" data-aos-delay="600" type="submit" value="find now" class="btn">
+    </form> -->
+
+    <!-- <div class="pt-8 pb-10 p-relative px-10 px-4--xs pt-4--xs pb-4--xs home-search-banner" style="background: rgb(255, 255, 255); border: 1px solid rgb(230, 230, 230); box-shadow: rgba(0, 0, 0, 0.04) 0px 8px 16px; border-radius: 12px;"><div class="flex"><div style="min-width: 136px;"><div><div class="p-relative"><button class="flex flex-middle flex-between t-all fs-2 focus:bc-secondary-500 bg-transparent bc-neutral-100 c-pointer c-neutral-900" style="border-style: hidden;"><div class="fs-2 c-inherit flex flex-nowrap"><div class="flex flex-middle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><mask id="mask0_1265_1893" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24" style="mask-type: alpha;"><rect width="24" height="24" fill="#D9D9D9"></rect></mask><g mask="url(#mask0_1265_1893)"><path d="M14.45 18.375L13.75 17.65L18.9 12.5H2.80005V11.5H18.9L13.75 6.35L14.45 5.625L20.8251 12L14.45 18.375Z" fill="#1A1A1A"></path></g></svg><span class="fw-500 fs-4 ml-2" style="line-height: 24px;">One way</span></div></div><svg width="14" height="9" fill="currentColor" class="t-all ml-3" style="color: rgb(153, 153, 153); transform: rotate(-180deg);"><g fill="none" fill-rule="evenodd"><path d="M15 12H-1V-4h16z"></path><path stroke="#FFF" stroke-width="0.5" fill="currentColor" d="M11.59 8L7 3.42 2.41 8 1 6.59l6-6 6 6z"></path></g></svg></button></div></div></div><div style="margin-left: 48px;"><div><div class="p-relative br-4"><button class="flex flex-middle flex-between t-all fs-2 focus:bc-secondary-500 bg-transparent bc-neutral-100 c-pointer c-neutral-900" style="border-style: hidden;"><div class="fs-2 c-inherit flex flex-nowrap"><div class="flex flex-middle"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><mask id="mask0_1265_2374" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24" style="mask-type: alpha;"><rect width="24" height="24" fill="#D9D9D9"></rect></mask><g mask="url(#mask0_1265_2374)"><path d="M12.4528 11.2453C11.4465 11.2453 10.5912 10.8931 9.88679 10.1887C9.18239 9.48428 8.83019 8.62893 8.83019 7.62264C8.83019 6.63648 9.18239 5.78596 9.88679 5.07109C10.5912 4.35703 11.4465 4 12.4528 4C13.4591 4 14.3145 4.35703 15.0189 5.07109C15.7233 5.78596 16.0755 6.63648 16.0755 7.62264C16.0755 8.62893 15.7233 9.48428 15.0189 10.1887C14.3145 10.8931 13.4591 11.2453 12.4528 11.2453ZM19.6377 20H5.26792C4.90566 20 4.60377 19.8792 4.36226 19.6377C4.12075 19.3962 4 19.0943 4 18.7321V18.0075C4 17.5044 4.14611 17.0363 4.43834 16.6032C4.72976 16.1709 5.11698 15.834 5.6 15.5925C6.74717 15.0491 7.88951 14.6413 9.02702 14.3692C10.1637 14.0979 11.3057 13.9623 12.4528 13.9623C13.6 13.9623 14.7423 14.0979 15.8798 14.3692C17.0166 14.6413 18.1585 15.0491 19.3057 15.5925C19.7887 15.834 20.1763 16.1709 20.4685 16.6032C20.76 17.0363 20.9057 17.5044 20.9057 18.0075V18.7321C20.9057 19.0943 20.7849 19.3962 20.5434 19.6377C20.3019 19.8792 20 20 19.6377 20ZM5.20755 18.7925H19.6981V18.0075C19.6981 17.7258 19.6128 17.469 19.4421 17.2371C19.2706 17.0061 19.034 16.8101 18.7321 16.6491C17.7258 16.166 16.6945 15.7989 15.6383 15.5478C14.5813 15.2958 13.5195 15.1698 12.4528 15.1698C11.3862 15.1698 10.3247 15.2958 9.26853 15.5478C8.21152 15.7989 7.17987 16.166 6.17359 16.6491C5.8717 16.8101 5.63542 17.0061 5.46475 17.2371C5.29328 17.469 5.20755 17.7258 5.20755 18.0075V18.7925ZM12.4528 10.0377C13.117 10.0377 13.6857 9.80106 14.1591 9.3277C14.6316 8.85514 14.8679 8.28679 14.8679 7.62264C14.8679 6.95849 14.6316 6.39014 14.1591 5.91758C13.6857 5.44423 13.117 5.20755 12.4528 5.20755C11.7887 5.20755 11.2203 5.44423 10.7478 5.91758C10.2744 6.39014 10.0377 6.95849 10.0377 7.62264C10.0377 8.28679 10.2744 8.85514 10.7478 9.3277C11.2203 9.80106 11.7887 10.0377 12.4528 10.0377Z" fill="#1A1A1A"></path></g></svg><span class="fw-500 fs-4 ml-2" style="line-height: 24px;">1 Adult, Economy</span></div></div><svg width="14" height="9" fill="currentColor" class="t-all ml-3" style="transform: rotate(-180deg); color: rgb(153, 153, 153);"><g fill="none" fill-rule="evenodd"><path d="M15 12H-1V-4h16z"></path><path stroke="#FFF" stroke-width="0.5" fill="currentColor" d="M11.59 8L7 3.42 2.41 8 1 6.59l6-6 6 6z"></path></g></svg></button></div></div></div></div><div class="flex flex-row flex-middle mt-8"><div class="flex flex-center flex-column flex-middle pl-3 pr-3 h-8 br-16 mr-2 fs-14 fw-500 bg-secondary-100 bc-secondary-500 c-secondary-500 c-pointer ba">Regular fare</div><div class="flex flex-center flex-column flex-middle pl-3 pr-3 h-8 br-16 mr-2 fs-14 fw-500 hover:bg-neutral-0 bc-neutral-100 c-pointer ba"><div class="" data-tooltipped="" aria-describedby="tippy-tooltip-1" data-original-title="undefined" style="display: flex; line-height: 16px;"><div class="fs-14 fw-500">Student fare</div></div></div><div class="flex flex-center flex-column flex-middle pl-3 pr-3 h-8 br-16 mr-2 fs-14 fw-500 hover:bg-neutral-0 bc-neutral-100 c-pointer ba"><div class="" data-tooltipped="" aria-describedby="tippy-tooltip-2" data-original-title="undefined" style="display: flex; line-height: 16px;"><div class="fs-14 fw-500">Senior citizen fare</div></div></div><div class="flex flex-center flex-column flex-middle pl-3 pr-3 h-8 br-16 mr-2 fs-14 fw-500 hover:bg-neutral-0 bc-neutral-100 c-pointer ba"><div class="" data-tooltipped="" aria-describedby="tippy-tooltip-3" data-original-title="undefined" style="display: flex; line-height: 16px;"><div class="fs-14 fw-500">Armed forces fare</div></div></div><div class="" data-tooltipped="" aria-describedby="tippy-tooltip-4" data-original-title="undefined" style="display: flex; line-height: 16px;"></div></div><div class="w-100p mt-6 mb-8"><div><div class="dropdown-container h-13 bc-neutral-100 flex ba  "><div class="field-1 flex flex-middle p-relative pr-4 w-100p "><div class="mx-4"><svg width="20" height="17" viewBox="0 0 20 17" fill="#808080" class="icon-1"><path d="M1.37578 16.4977V15.4977H18.3758V16.4977H1.37578ZM2.95078 11.4227L0.675781 7.49766L1.52578 7.29766L3.32578 8.84766L8.72578 7.39766L4.67578 0.547657L5.75078 0.222656L12.6008 6.34766L17.8258 4.94766C18.2091 4.84766 18.5551 4.91832 18.8638 5.15966C19.1718 5.40166 19.3258 5.71432 19.3258 6.09766C19.3258 6.36432 19.2508 6.59766 19.1008 6.79766C18.9508 6.99766 18.7508 7.13099 18.5008 7.19766L2.95078 11.4227Z"></path></svg></div><input class="w-100p fs-4 fw-500 " placeholder="Where from?" value="BLR - Bangalore, IN" style="border: none;"></div><div class="p-relative"><div class="bc-grey-10 bl bw-1 d-block flex-1  " style="height: 51px;"></div><div class="mx-4 p-absolute nl-8 t-2 z-10"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" class="c-pointer"><rect width="32" height="32" rx="16" fill="white"></rect><g clip-path="url(#clip0_160_1650)"><path d="M24.1666 14.8333H7.83325" stroke="#3366CC" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.83325 14.8333L13.6666 9" stroke="#3366CC" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.83342 18.3335H24.1667" stroke="#3366CC" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path><path d="M24.1667 18.3334L18.3334 24.1667" stroke="#3366CC" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="16" cy="16" r="13.375" stroke="#3366CC" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"></circle></g><defs><clipPath id="clip0_160_1650"><rect width="28" height="28" fill="white" transform="translate(2 2)"></rect></clipPath></defs></svg></div></div><div class="field-2 flex  flex-middle p-relative pr-4 w-100p "><div class="mr-4 pl-8 icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="#808080" class="icon-2"><mask id="mask0_160_1644" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24" style="mask-type: alpha;"><rect width="24" height="24" fill="#D9D9D9"></rect></mask><g mask="url(#mask0_160_1644)"><path d="M3.5 20.5004V19.5004H20.5V20.5004H3.5ZM18.975 15.4004L3.5 11.1254V6.70039L4.3 6.92539L5 9.05039L10.5 10.6004V2.65039L11.625 2.92539L14.375 11.6754L19.625 13.1504C19.8917 13.2171 20.1043 13.3587 20.263 13.5754C20.421 13.7921 20.5 14.0337 20.5 14.3004C20.5 14.6837 20.3377 14.9921 20.013 15.2254C19.6877 15.4587 19.3417 15.5171 18.975 15.4004Z"></path></g></svg></div><input class="w-100p fs-4 fw-500 " placeholder="Where to?" value="BOM - Mumbai, IN" style="border: none;"></div></div></div></div><div class="row  p-relative "><div class="col flex flex-middle w-100p" style="margin-right: -4px;"><div><div><div class="flex flex-middle p-relative homeCalender"> <button class="flex flex-middle  t-all fs-2 focus:bc-secondary-500 bg-transparent bc-neutral-100 c-pointer pr-2 pl-3 pt-2 pb-2 ba br-4 h-8 c-neutral-900" style="min-width: 191px; height: 52px; border-width: 1px 0px 1px 1px; border-style: solid; border-color: rgb(230, 230, 230); border-radius: 6px 0px 0px 6px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><mask id="mask0_985_9207" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24" style="mask-type: alpha;"><rect width="24" height="24" fill="#D9D9D9"></rect></mask><g mask="url(#mask0_985_9207)"><path d="M12 14.1504C11.8 14.1504 11.621 14.0754 11.463 13.9254C11.3043 13.7754 11.225 13.5921 11.225 13.3754C11.225 13.1754 11.3043 13.0004 11.463 12.8504C11.621 12.7004 11.8 12.6254 12 12.6254C12.2 12.6254 12.3793 12.7004 12.538 12.8504C12.696 13.0004 12.775 13.1754 12.775 13.3754C12.775 13.5921 12.696 13.7754 12.538 13.9254C12.3793 14.0754 12.2 14.1504 12 14.1504ZM8 14.1504C7.8 14.1504 7.621 14.0754 7.463 13.9254C7.30433 13.7754 7.225 13.5921 7.225 13.3754C7.225 13.1754 7.30433 13.0004 7.463 12.8504C7.621 12.7004 7.8 12.6254 8 12.6254C8.2 12.6254 8.37933 12.7004 8.538 12.8504C8.696 13.0004 8.775 13.1754 8.775 13.3754C8.775 13.5921 8.696 13.7754 8.538 13.9254C8.37933 14.0754 8.2 14.1504 8 14.1504ZM16 14.1504C15.8 14.1504 15.621 14.0754 15.463 13.9254C15.3043 13.7754 15.225 13.5921 15.225 13.3754C15.225 13.1754 15.3043 13.0004 15.463 12.8504C15.621 12.7004 15.8 12.6254 16 12.6254C16.2 12.6254 16.3793 12.7004 16.538 12.8504C16.696 13.0004 16.775 13.1754 16.775 13.3754C16.775 13.5921 16.696 13.7754 16.538 13.9254C16.3793 14.0754 16.2 14.1504 16 14.1504ZM12 18.0004C11.8 18.0004 11.621 17.9254 11.463 17.7754C11.3043 17.6254 11.225 17.4421 11.225 17.2254C11.225 17.0254 11.3043 16.8464 11.463 16.6884C11.621 16.5297 11.8 16.4504 12 16.4504C12.2 16.4504 12.3793 16.5297 12.538 16.6884C12.696 16.8464 12.775 17.0254 12.775 17.2254C12.775 17.4421 12.696 17.6254 12.538 17.7754C12.3793 17.9254 12.2 18.0004 12 18.0004ZM8 18.0004C7.8 18.0004 7.621 17.9254 7.463 17.7754C7.30433 17.6254 7.225 17.4421 7.225 17.2254C7.225 17.0254 7.30433 16.8464 7.463 16.6884C7.621 16.5297 7.8 16.4504 8 16.4504C8.2 16.4504 8.37933 16.5297 8.538 16.6884C8.696 16.8464 8.775 17.0254 8.775 17.2254C8.775 17.4421 8.696 17.6254 8.538 17.7754C8.37933 17.9254 8.2 18.0004 8 18.0004ZM16 18.0004C15.8 18.0004 15.621 17.9254 15.463 17.7754C15.3043 17.6254 15.225 17.4421 15.225 17.2254C15.225 17.0254 15.3043 16.8464 15.463 16.6884C15.621 16.5297 15.8 16.4504 16 16.4504C16.2 16.4504 16.3793 16.5297 16.538 16.6884C16.696 16.8464 16.775 17.0254 16.775 17.2254C16.775 17.4421 16.696 17.6254 16.538 17.7754C16.3793 17.9254 16.2 18.0004 16 18.0004ZM5.625 21.0004C5.15833 21.0004 4.771 20.8464 4.463 20.5384C4.15433 20.2297 4 19.8421 4 19.3754V6.62539C4 6.15872 4.15433 5.77139 4.463 5.46339C4.771 5.15472 5.15833 5.00039 5.625 5.00039H7.375V3.30039C7.375 3.15039 7.429 3.02539 7.537 2.92539C7.64567 2.82539 7.775 2.77539 7.925 2.77539C8.075 2.77539 8.2 2.82539 8.3 2.92539C8.4 3.02539 8.45 3.15039 8.45 3.30039V5.00039H15.625V3.27539C15.625 3.12539 15.6707 3.00439 15.762 2.91239C15.854 2.82106 15.975 2.77539 16.125 2.77539C16.2583 2.77539 16.375 2.82106 16.475 2.91239C16.575 3.00439 16.625 3.12539 16.625 3.27539V5.00039H18.375C18.8417 5.00039 19.2293 5.15472 19.538 5.46339C19.846 5.77139 20 6.15872 20 6.62539V19.3754C20 19.8421 19.846 20.2297 19.538 20.5384C19.2293 20.8464 18.8417 21.0004 18.375 21.0004H5.625ZM5.625 20.0004H18.375C18.5583 20.0004 18.7083 19.9421 18.825 19.8254C18.9417 19.7087 19 19.5587 19 19.3754V10.6254H5V19.3754C5 19.5587 5.05833 19.7087 5.175 19.8254C5.29167 19.9421 5.44167 20.0004 5.625 20.0004ZM5 9.62539H19V6.62539C19 6.44206 18.9417 6.29206 18.825 6.17539C18.7083 6.05872 18.5583 6.00039 18.375 6.00039H5.625C5.44167 6.00039 5.29167 6.05872 5.175 6.17539C5.05833 6.29206 5 6.44206 5 6.62539V9.62539Z" fill="#808080"></path></g></svg><div class="fs-4 fw-500 c-inherit flex flex-nowrap ml-4"> Fri, Jul 28</div></button><span style="height: 52px; padding-top: 7px; border-width: 1px 0px; border-style: solid; border-color: rgb(230, 230, 230); border-image: initial;"><svg width="1" height="36" viewBox="0 0 1 36" fill="none"><line x1="0.5" y1="2.18557e-8" x2="0.499998" y2="36" stroke="#E6E6E6"></line></svg></span> <button class="flex flex-middle  t-all fs-2 focus:bc-secondary-500 bg-transparent bc-neutral-100 c-pointer pr-2 pl-3 pt-2 pb-2 ba br-4 h-8 c-neutral-900" style="min-width: 185px; height: 52px; border-width: 1px 1px 1px 0px; border-style: solid; border-color: rgb(230, 230, 230); border-radius: 0px 6px 6px 0px;"><div class=" c-neutral-500 fs-4 fw-500 flex-nowrap  ml-6">Return</div></button></div></div></div><div class="flex flex-around ml-6 bg-primary-500 hover:bg-primary-600 c-white bc-transparent c-pointer w-100p py-2 px-5 h-10 fs-4 fw-600 t-all button bs-solid tp-color td-500 bw-1 br-4 lh-solid box-border home-search-btn ml-2--xs" style="height: 52px; padding-top: 12px; border-radius: 6px;"><span class="fw-600 fs-4 lh-2 flex flex-middle" style="margin-bottom: 4px;">Search flights</span></div></div></div></div> -->
+
+<!-- </section> -->
+
+
+<section class="fl-hotel">
+    <form action="/allflights/search" method="post">
+
+    <div class="icons3">
+        <input data-aos="zoom-in" data-aos-delay="100" type="submit" value="flights" class="btnn">
+        <input data-aos="zoom-in" data-aos-delay="200" type="submit" value="hotels" class="btnn2">
+        <div class="links">
+            <p  data-aos="fade-up" data-aos-delay="100" id="link1" name="tripType" value="one-way">One Way</p>
+            <p  data-aos="fade-up" data-aos-delay="200" id="link2" name="tripType" value="round-trip">Round Trip</p>     
+        </div>
+    </div>
+
+    <div class="details2">
+        <div class="from1"  data-aos="fade-up" data-aos-delay="100">
+            <div class="box">
+                <span>From :</span>
+                <div id="plane1" class="fas fa-plane-departure"></div><br>
+            <select  name="departure" id="from-select">
+                <option value="" disabled selected>Select a state</option>
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+            <option value="Assam">Assam</option>
+            <option value="Bihar">Bihar</option>
+            <option value="Chhattisgarh">Chhattisgarh</option>
+            <option value="Goa">Goa</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Haryana">Haryana</option>
+            <option value="Himachal Pradesh">Himachal Pradesh</option>
+            <option value="Jharkhand">Jharkhand</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Kerala">Kerala</option>
+            <option value="Madhya Pradesh">Madhya Pradesh</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Manipur">Manipur</option>
+            <option value="Meghalaya">Meghalaya</option>
+            <option value="Mizoram">Mizoram</option>
+            <option value="Nagaland">Nagaland</option>
+            <option value="Odisha">Odisha</option>
+            <option value="Punjab">Punjab</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Sikkim">Sikkim</option>
+            <option value="Tamil Nadu">Tamil Nadu</option>
+            <option value="Telangana">Telangana</option>
+            <option value="Tripura">Tripura</option>
+            <option value="Uttar Pradesh">Uttar Pradesh</option>
+            <option value="Uttarakhand">Uttarakhand</option>
+            <option value="West Bengal">West Bengal</option>
+            </select>
+            </div>
+        </div>
+        <div class="where1"  data-aos="fade-up" data-aos-delay="200">
+            <div class="box">
+                <span>Where :</span>
+                <div id="plane1" class="fas fa-plane-arrival"></div><br>
+                <select  name="arrival" id="from-select">
+                    <option value="" disabled selected>Select the place</option>
+                    <% destinations.forEach(function(destination){ %>
+                    <option value="Hogwarts Castle"><%- destination.title %></option>
+                    <% }); %>
+                </select>
+            </div>
+        </div>
+        <div class="journey-date"  data-aos="fade-up" data-aos-delay="300">
+            <div class="box">
+                <div class="journey">
+                    <span>Journey Date</span><br>
+                    <input type="date" id="date1" name="departureDate" value="">    
+                </div>
+                <div class="return">
+                    <span>Return Date</span><br>
+                    <input type="date" id="date1" name="arrivalDate" value="">    
+                </div>
+            </div>
+        </div>
+        <div class="passengers"  data-aos="fade-up" data-aos-delay="400">
+            <div class="box">
+                <span>Passengers, Class</span><br>
+                <p id="click" name="adults" >1</p>
+                <span class="selectedOption">Business</span>
+            </div>
+        </div>
+    </div>
+    <div class="content1" style="text-align: center; align-items: center; margin-top: 2rem;">
+        <!-- <a href="" class="btn">Search</a> -->
+        <input data-aos="fade-up" data-aos-delay="600" type="submit" value="Search" class="btn">
+    </div>
     </form>
 </section>
 
-
+<div class="dropdown1" id="dropdownMenu" style="padding: 1rem;">
+    <div class="box">
+        <h3 id="huge">Passengers</h3>
+    </div>
+    <div class="flex-container">
+      <p id="adultCount">1</p>
+      <span>Adult</span>
+      <div class="plus-minus" style="margin-top: 1.5rem;">
+        <div class="fa fa-plus" id="adultPlus"></div>
+        <div class="fa fa-minus" id="adultMinus"></div>
+      </div>
+    </div>
+    <div class="flex-container2">
+      <p id="childrenCount">0</p>
+      <span>Children</span>
+      <div class="plus-minus" style="margin-top: 1.5rem;">
+        <div class="fa fa-plus" id="childrenPlus"></div>
+        <div class="fa fa-minus" id="childrenMinus"></div>
+      </div>
+    </div>
+    <div class="box" style="margin-top: 1.3rem;margin-bottom: 1rem;">
+        <h3 id="huge">Cabin Class</h3>
+    </div>
+    <div class="cabinClass">
+        <p class="cabinOption cabinOption1">Economy</p>
+        <p class="cabinOption cabinOption2 selected">Business</p>
+        <p class="cabinOption cabinOption3">First Class</p>
+    </div>    
+  </div>
+  
 <% if(user && user.role==="user" && user.bookedFlights && user.bookedFlights.length > 0 && destination !== null && user.bookedFlights[0].arrival){ %>
     <section class="tp">
         <h1>My Schedule</h1>
     </section>
     
-    <section class="my-schedule">
+    <section class="my-schedule" style="margin-top: 5rem;">
         <% bookedFlight = user.bookedFlights[0] %>
         <div class="box-container">
             <div class="box">
@@ -487,19 +611,14 @@
 
     function handleParallax() {
       let value = window.scrollY;
-      background.style.left = -value * .06 + 'px';
-      wizard.style.left = -value * .13 + 'px';
-      right.style.left = value * .13 + 'px';
-      left.style.left = -value * .13 + 'px';
+      background.style.left = value * .06 + 'px';
+      wizard.style.left = -value * .3 + 'px';
+      right.style.left = value * .3 + 'px';
+      left.style.left = -value * .3 + 'px';
       text1.style.marginLeft = -value * 2.7 + 'px';
       text2.style.marginRight= -value * 2 + 'px';
     }
 
-    // handleParallax();
-
-    // window.addEventListener('scroll', function () {
-    //   handleParallax();
-    // });
   
     function handleMobileParallax() {
       let value = window.scrollY;
@@ -515,9 +634,7 @@
       text1.style.marginLeft = -value * 2.7 + 'px';
       text2.style.marginRight= -value * 2 + 'px';
     }
-  
-    // handleMobileParallax();
-  
+    
     window.addEventListener('scroll', function () {
       if (window.innerWidth <= 768) {
         handleMobileParallax();
@@ -529,3 +646,141 @@
 
 <%- include("partials/footer") -%>
 
+<script>
+    const adultCountElement = document.getElementById('adultCount');
+    const adultPlusIcon = document.getElementById('adultPlus');
+    const adultMinusIcon = document.getElementById('adultMinus');
+    
+    const childrenCountElement = document.getElementById('childrenCount');
+    const childrenPlusIcon = document.getElementById('childrenPlus');
+    const childrenMinusIcon = document.getElementById('childrenMinus');
+    
+    let adultCount = 1;
+    let childrenCount = 0;
+    
+    function updateCount(countElement, value, min, max) {
+      let count = parseInt(countElement.textContent) + value;
+      count = Math.min(Math.max(min, count), max);
+      countElement.textContent = count;
+    }
+    
+    adultPlusIcon.addEventListener('click', () => {
+      updateCount(adultCountElement, 1, 1, 5);
+      adultCount = parseInt(adultCountElement.textContent);
+      updateTotal();
+    });
+    
+    adultMinusIcon.addEventListener('click', () => {
+      updateCount(adultCountElement, -1, 1, 5);
+      adultCount = parseInt(adultCountElement.textContent);
+      updateTotal();
+    });
+    
+    childrenPlusIcon.addEventListener('click', () => {
+      updateCount(childrenCountElement, 1, 0, 5);
+      childrenCount = parseInt(childrenCountElement.textContent);
+      updateTotal();
+    });
+    
+    childrenMinusIcon.addEventListener('click', () => {
+      updateCount(childrenCountElement, -1, 0, 5);
+      childrenCount = parseInt(childrenCountElement.textContent);
+      updateTotal();
+    });
+    
+    const clickElement = document.getElementById('click');
+    
+    function updateTotal() {
+      const totalPassengers = adultCount + childrenCount;
+      clickElement.textContent = totalPassengers;
+    }
+    
+    updateTotal();
+  </script>
+
+
+
+  <script>
+    let dropdownMenu = document.querySelector('.dropdown1');
+    let clickButton = document.querySelector('#click');
+    clickButton.onclick = () => {
+      console.log("Button Clicked!");
+      dropdownMenu.classList.toggle('active');
+    };
+    function handleClickOutside(event) {
+      if (!dropdownMenu.contains(event.target) && !clickButton.contains(event.target)) {
+        dropdownMenu.classList.remove('active');
+      }
+    }
+      document.addEventListener('click', handleClickOutside);
+  </script>
+
+
+
+<script>
+    const cabinOptions = document.querySelectorAll('.cabinOption');
+    const selectedOptionElement = document.querySelector('.selectedOption');
+    let selectedOption = 'Business';
+    selectedOptionElement.textContent = selectedOption;
+  
+    cabinOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        cabinOptions.forEach((option) => {
+          option.classList.remove('selected');
+        });
+        option.classList.add('selected');
+        selectedOption = option.textContent;
+        selectedOptionElement.textContent = selectedOption;
+      });
+    });
+  
+    const passengerOptions = document.querySelectorAll('.box .passengerOption');
+  
+    let totalPassengers = 1;
+    clickElement.textContent = totalPassengers;
+  
+    passengerOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        const optionText = option.textContent;
+        if (optionText === '+') {
+          totalPassengers = Math.min(totalPassengers + 1, 5);
+        } else if (optionText === '-' && totalPassengers > 1) {
+          totalPassengers -= 1;
+        }
+        clickElement.textContent = totalPassengers;
+      });
+    });
+  </script>
+  
+
+  <script>
+const linksContainer = document.querySelector('.links');
+const links = linksContainer.querySelectorAll('p');
+
+function handleLinkClick(event) {
+  if (event.target.tagName !== 'P') return; // Ignore clicks on non-<p> elements
+
+  links.forEach(link => {
+    if (link === event.target) {
+      console.log('Button Clicked!');
+      link.classList.add('selected');
+      if (link.id === 'link1') {
+        // Hide the return date input
+        document.querySelector('.return').style.visibility = 'hidden';
+      } else {
+        // Show the return date input
+        document.querySelector('.return').style.visibility = 'visible';
+      }
+    } else {
+      link.classList.remove('selected');
+    }
+  });
+}
+
+linksContainer.addEventListener('click', handleLinkClick);
+
+// Set the "One Way" link as selected by default
+document.getElementById('link2').classList.add('selected');
+// Hide the return date input by default
+document.querySelector('.return').style.visibility = 'visible';
+  </script>

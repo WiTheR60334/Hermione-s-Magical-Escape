@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const ejs = require('ejs');
+const ejs = require("ejs");
 const _ = require("lodash");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -15,9 +15,11 @@ const fs = require('fs');
 const cron = require("node-cron");
 const paypal = require("paypal-rest-sdk");
 const flash = require("connect-flash");
+const path = require("path");
 // const { PDFDocument, StandardFonts } = require('pdf-lib');
 const puppeteer = require('puppeteer');
-const path = require('path');
+const DateOnly = require("mongoose-dateonly")(mongoose);
+const FacebookStrategy = require('passport-facebook').Strategy
 
 const app = express();
 
@@ -79,6 +81,8 @@ const usersSchema = new mongoose.Schema({
     }],
     googleId: String,
     googleDisplayName: String,
+    facebookId : String,
+    facebookDisplayName : String,
     bookedFlights: [{
       flight: {
         type: mongoose.Schema.Types.ObjectId,
@@ -169,11 +173,42 @@ const usersSchema = new mongoose.Schema({
   }
   ));
   
+  passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: "http://localhost:3000/auth/facebook/secrets",
+    profileFields: ['id', 'displayName'] // Adjust the profile fields as needed
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOne({ facebookId: profile.id })
+      .exec()
+      .then((user) => {
+        if (!user) {
+          const newUser = new User({
+            facebookId: profile.id,
+            facebookDisplayName: profile.displayName,
+            favorites: []
+          });
+          return newUser.save();
+        } else {
+          return user;
+        }
+      })
+      .then((user) => {
+        return cb(null, user);
+      })
+      .catch((err) => {
+        return cb(err);
+      });
+  }
+  ));
+  
+
 
   // Define the schedule schema
 const scheduleSchema = new mongoose.Schema({
     departureDate: {
-      type: Date,
+      type: mongoose.Schema.Types.DateOnly,
       required: true,
     },
     departureTime: {
@@ -181,7 +216,7 @@ const scheduleSchema = new mongoose.Schema({
       required: true,
     },
     arrivalDate: {
-      type: Date,
+      type: mongoose.Schema.Types.DateOnly,
       required: true,
     },
     arrivalTime: {
@@ -384,16 +419,31 @@ const scheduleSchema = new mongoose.Schema({
     }
   );
   
+  app.get('/auth/facebook',
+  passport.authenticate('facebook'));
 
-// Function to delete flights that are 8 days old
+// Facebook callback route
+app.get('/auth/facebook/secrets',
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect to the secrets page or any other route you desire
+    res.redirect('/');
+  });
+
 const deleteOutdatedFlights = async () => {
   try {
     const eightDaysAgo = new Date();
     eightDaysAgo.setDate(eightDaysAgo.getDate() - 8);
 
-    // Delete flights that are older than eightDaysAgo
-    await Flight.deleteMany({ departureDate: { $lt: eightDaysAgo } });
-    console.log('Outdated flights deleted successfully.');
+    // Convert eightDaysAgo to the format "YYYYMMDD"
+    const formattedEightDaysAgo = eightDaysAgo.toISOString().slice(0, 10).replace(/-/g, '');
+
+    // Delete flights that have any schedule with departureDate older than formattedEightDaysAgo
+    const result = await Flight.deleteMany({
+      "schedule.departureDate": { $lt: formattedEightDaysAgo }
+    });
+
+    console.log(`${result.deletedCount} outdated flights deleted successfully.`);
   } catch (err) {
     console.error('Error deleting outdated flights:', err);
   }
@@ -1186,6 +1236,18 @@ app.post("/allflights/:flightId/bookflight/paypal", isAuthenticated, async funct
   
 //Payment Success route:
 
+
+app.get("/allflights/:flightId/bookflight/paypal/cancel", function(req,res){
+  const flightId = req.params.flightId;
+
+  res.redirect(`/allflights/${flightID}`);
+});
+
+
+
+  
+//Payment Success route:
+
 app.get("/allflights/:flightId/bookflight/paypal/success", isAuthenticated, async function (req, res) {
   try {
     const flightId = req.params.flightId;
@@ -1211,36 +1273,10 @@ app.get("/allflights/:flightId/bookflight/paypal/success", isAuthenticated, asyn
 
       console.log("Flight booked successfully");
 
-      // Generate PDF ticket
-      const doc = new PDFDocument();
-      const ticketPath = `ticket for ${newbooking.departure + " to " + newbooking.arrival}.pdf`;
-      const stream = fs.createWriteStream(ticketPath);
-
-      doc.pipe(stream);
-      doc.fontSize(12).text(`Name: ${newbooking.name}`);
-      doc.fontSize(12).text(`${newbooking.departure} to ${newbooking.arrival}`);
-      doc.fontSize(12).text(`Passport Number: ${newbooking.passportNumber}`);
-      doc.fontSize(12).text(`Mobile Number: ${newbooking.mobile}`);
-      doc.fontSize(12).text(`Email Address: ${newbooking.email}`);
-      doc.end();
-
-      // Set the ticketPath in the bookedFlight object
-      newbooking.ticketPath = ticketPath;
-      await User.findOneAndUpdate(
-        { _id: req.user._id, "bookedFlights.flight": newbooking.flight },
-        { $set: { "bookedFlights.$.ticketPath": ticketPath } }
-      );
-      
-      // Trigger the download of the PDF ticket
-      res.setHeader("Content-disposition", `attachment; filename=${ticketPath}`);
-      res.setHeader("Content-type", "application/pdf");
-      fs.createReadStream(ticketPath).pipe(res);
 
       // Store the newbooking object in the session
       req.session.newbooking = newbooking;
       req.session.flight = flight;
-
-    // Redirect the user to the /ticket route
       res.redirect("/ticket");
 
     } else {
@@ -1253,26 +1289,71 @@ app.get("/allflights/:flightId/bookflight/paypal/success", isAuthenticated, asyn
   }
 });
 
+
+
+
+
+
 // New ticket route
 app.get("/ticket", isAuthenticated, function (req, res) {
   try {
     // Retrieve the newbooking and flight objects from the session
     const newbooking = req.session.newbooking;
     const flight = req.session.flight;
-
+    console.log(newbooking.email);
     // Render the "ticket.ejs" template with the necessary data
     res.render("ticket", { user: req.user, newbooking: newbooking, flight: flight });
 
-    // Remove the newbooking and flight objects from the session after rendering the ticket
-    req.session.newbooking = null;
-    req.session.flight = null;
-    // Clear the booking data from the session
-    req.session.bookingData = null;
   } catch (err) {
     console.log(err);
     res.redirect("/");
   }
 });
+
+
+//Async Function Code :
+
+async function sendTicketEmail(userEmail, ticketPath) {
+  try {
+    // Create a Nodemailer transporter with your email service provider settings
+    const transporter = nodemailer.createTransport({
+      host : process.env.SMTP_HOST,
+      port : 587,
+      secure : false,
+      auth: {
+        user: process.env.user, // Replace with your Gmail email
+        pass: process.env.pass, // Replace with your Gmail password or an app password if enabled
+      },
+      tls : {
+        ciphers : "SSLv3"
+      }
+    });
+
+    // Read the ticket file from disk
+    const ticketFile = fs.readFileSync(ticketPath);
+
+    // Define the email options
+    const mailOptions = {
+      from: process.env.user, // Replace with your Gmail email
+      to: userEmail, // Email address of the user
+      subject: "Your Flight Ticket",
+      text: "Please find your flight ticket attached.",
+      attachments: [
+        {
+          filename: "ticket.pdf",
+          content: ticketFile, // Attach the ticket file content
+        },
+      ],
+    };
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.log("Error sending email:", error);
+  }
+}
+
 
 app.get('/download-ticket', async (req, res) => {
   try {
@@ -1298,10 +1379,25 @@ app.get('/download-ticket', async (req, res) => {
     const pdfBuffer = await page.pdf({ format: 'A4' });
     await browser.close();
 
+    // Save the PDF ticket to a file
+    const ticketPath = `ticket-for-${newbooking.departure}-${newbooking.arrival}.pdf`;
+    fs.writeFileSync(ticketPath, pdfBuffer);
+
     // Set the response headers for downloading the file
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=ticket.pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${path.basename(ticketPath)}`);
     res.send(pdfBuffer);
+
+     // Set the ticketPath in the bookedFlight object
+     newbooking.ticketPath = ticketPath;
+     await User.findOneAndUpdate(
+       { _id: req.user._id, "bookedFlights.flight": newbooking.flight },
+       { $set: { "bookedFlights.$.ticketPath": ticketPath } }
+     );
+      console.log(newbooking.email);
+    // Send the ticket to the user's email
+    sendTicketEmail(newbooking.email, ticketPath);
+
   } catch (error) {
     console.error('Error generating ticket:', error);
     res.status(500).send('An error occurred while generating the ticket.');
@@ -1309,11 +1405,41 @@ app.get('/download-ticket', async (req, res) => {
 });
 
 
-app.get("/allflights/:flightId/bookflight/paypal/failure", function(req,res){
-  console.log("Payment has failed because of error");
-  const flightId = req.params.flightId;
-  res.redirect(`/allflights/${flightId}`);
+// Other required dependencies
+
+// Add your existing route handlers and middleware here
+
+// Route to generate the PDF
+app.post('/generate-pdf', async (req, res) => {
+  try {
+    // Get the current EJS file content
+    const ejsFileContent = fs.readFileSync('views/ticket.ejs', 'utf8');
+
+    // Render the EJS file with any necessary data (if applicable)
+    // Replace the variables below with the actual data you want to pass to the EJS file
+    const htmlContent = ejs.render(ejsFileContent, { data: 'your_data_here' });
+
+    // Generate a PDF from the HTML using Puppeteer
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf();
+    await browser.close();
+
+    // Set the response headers for PDF download
+    res.setHeader('Content-Disposition', 'attachment; filename="webpage.pdf"');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Length', pdfBuffer.length);
+
+    // Send the PDF buffer to the client
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error('Error while generating or sending the PDF:', err);
+    res.status(500).send('Error generating the PDF');
+  }
 });
+
+
 
 
   //Route for cancelling the booked flight.
@@ -1800,56 +1926,128 @@ app.get("/allhotels/:hotelId/bookhotel/paypal/success", isAuthenticated, async f
         await hotel.save();
   
         console.log("Hotel booked successfully");
-  
-       // Generate PDF ticket
-      const doc = new PDFDocument();
-      const ticketPath = `hotel booking for ${newbooking.customerName}.pdf`;
-      const stream = fs.createWriteStream(ticketPath);
-  
-      doc.pipe(stream);
-      doc.fontSize(20).text("Hotel Booking Confirmation Ticket");
-      doc.fontSize(12).text(`Name: ${newbooking.customerName}`);
-      doc.fontSize(12).text(`Mobile Number: ${newbooking.mobile}`);
-      doc.fontSize(12).text(`Number of Members : ${newbooking.numberOfMembers}`);
-      doc.fontSize(12).text(`Hotel Name: ${newbooking.hotelName}`);
-      doc.fontSize(12).text(`Number of Rooms Booked : ${newbooking.occupiedRooms}`);
-      doc.fontSize(12).text(`Total Amount Paid: ${totalAmount}`);
-      doc.fontSize(12).text(`Check In Date : ${newbooking.checkInDate}`);
-      doc.fontSize(12).text(`Check Out Date : ${newbooking.checkOutDate}`);
-      doc.fontSize(12).text(`Hotel Location: ${newbooking.location}`);
-      doc.fontSize(12).text(`Hotel Price Per Night: ${newbooking.pricePerNight}`);
-      doc.fontSize(12).text(`Total Available Rooms: ${newbooking.availableRooms}`);
-      doc.fontSize(12).text(`Hotel Rating : ${newbooking.rating}`);
-      // Display amenities as an unordered list
-      doc.fontSize(12).text("Hotel Amenities:");
-      doc.list(newbooking.amenities.split(", "), {
-        bulletRadius: 2,
-        textIndent: 10,
-        bulletIndent: 5,
-        lineGap: 2
-      });
-      doc.fontSize(20).text("Thank You for choosing our hotel. Hope you have a great experience");
-      doc.end();
-  
+
+      req.session.bookingHotel = null;
+      req.session.newbookinghotel = newbooking;
+      req.session.hotel = hotel;
+      req.session.totalAmount = totalAmount;
+      res.redirect(`/ticket/hotel`);
+  }
+  else{
+    console.log("No available rooms for the selected hotel");
+    res.redirect("/allhotels");
+  }
+});
+
+// New ticket route
+app.get("/ticket/hotel", isAuthenticated, function (req, res) {
+  try {
+    // Retrieve the newbooking and flight objects from the session
+    const newbooking = req.session.newbookinghotel;
+    const hotel = req.session.hotel;
+    const totalAmount = req.session.totalAmount;
+    console.log(newbooking.email);
+    // Render the "ticket.ejs" template with the necessary data
+    res.render("ticket_hotel", { user: req.user, newbooking: newbooking, hotel: hotel, totalAmount : totalAmount });
+
+  } catch (err) {
+    console.log(err);
+    res.redirect("/");
+  }
+});
+
+
+//Async Function Code :
+
+async function sendHotelEmail(userEmail, ticketPath) {
+  try {
+    // Create a Nodemailer transporter with your email service provider settings
+    const transporter = nodemailer.createTransport({
+      host : process.env.SMTP_HOST,
+      port : 587,
+      secure : false,
+      auth: {
+        user: process.env.user, // Replace with your Gmail email
+        pass: process.env.pass, // Replace with your Gmail password or an app password if enabled
+      },
+      tls : {
+        ciphers : "SSLv3"
+      }
+    });
+
+    // Read the ticket file from disk
+    const ticketFile = fs.readFileSync(ticketPath);
+
+    // Define the email options
+    const mailOptions = {
+      from: process.env.user, // Replace with your Gmail email
+      to: userEmail, // Email address of the user
+      subject: "Your Hotel Invoice",
+      text: "Please find your hotel invoice attached.",
+      attachments: [
+        {
+          filename: "ticket_hotel.pdf",
+          content: ticketFile, // Attach the ticket file content
+        },
+      ],
+    };
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.log("Error sending email:", error);
+  }
+}
+
+
+app.get('/download-ticket/hotel', async (req, res) => {
+  try {
+    // Retrieve the newbooking object from the session
+    const newbooking = req.session.newbookinghotel;
+    const hotel = req.session.hotel;
+    var totalAmount = req.session.totalAmount;
+
+    if (!newbooking || !hotel) {
+      // If newbooking is not found in the session, return an error or redirect as per your requirement
+      return res.status(400).send('Data not found in the session. Please book a flight first.');
+    }
+
+    const ticketTemplate = path.join(__dirname, 'views', 'ticket_hotel.ejs');
+
+    // Render the "ticket.ejs" template with the necessary data
+    const ticketHtml = await ejs.renderFile(ticketTemplate, { newbooking: newbooking, user: req.user, hotel: hotel, totalAmount : totalAmount });
+
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(ticketHtml);
+
+    // Generate PDF from the ticket HTML
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+    await browser.close();
+
+    // Save the PDF ticket to a file
+    const ticketPath = `hotel booking for ${newbooking.customerName}`;
+    fs.writeFileSync(ticketPath, pdfBuffer);
+
+    // Set the response headers for downloading the file
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${path.basename(ticketPath)}`);
+    res.send(pdfBuffer);
+
       // Set the ticketPath in the bookedFlight object
       newbooking.ticketPath = ticketPath;
       await User.findOneAndUpdate(
         { _id: req.user._id, "bookedHotels.hotel": newbooking.hotel },
         { $set: { "bookedHotels.$.ticketPath": ticketPath } }
       );
-  
-      // Trigger the download of the PDF ticket
-      res.setHeader('Content-disposition', `attachment; filename=${ticketPath}`);
-      res.setHeader('Content-type', 'application/pdf');
-      fs.createReadStream(ticketPath).pipe(res);
-
-      req.session.bookingHotel = null;
-      totalAmount = 0;
-      res.redirect(`/allhotels/${hotelId}`);
-  }
-  else{
-    console.log("No available rooms for the selected hotel");
-    res.redirect("/allhotels");
+      console.log(newbooking.email);
+    // Send the ticket to the user's email
+    sendHotelEmail(newbooking.email, ticketPath);
+    totalAmount = 0;
+  } catch (error) {
+    console.error('Error generating ticket:', error);
+    res.status(500).send('An error occurred while generating the ticket.');
   }
 });
 
@@ -1983,7 +2181,6 @@ app.post("/contact", function(req, res) {
     }
   });
 });
-
 
 
 const port = process.env.PORT || 3000;
