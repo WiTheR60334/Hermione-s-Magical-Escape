@@ -2,8 +2,6 @@
 
 <%- include("partials/header", {isHotelPage : false}); -%>
 
-
-
 <section class="book-hotel">
   <div class="box-container">
     <div class="box">
@@ -26,7 +24,6 @@
             <input type="number" class="form-control" id="numberOfMembers" name="numberOfMembers" placeholder="Enter number of members" required>
           </div>
     
-          <!-- Disabled input tag to display the number of rooms occupied -->
           <div class="form-group">
             <label for="numberOfRooms">Number of Rooms Occupied:</label>
             <input type="number" class="form-control" id="numberOfRooms" name="numberOfRooms" readonly>
@@ -70,20 +67,16 @@
 <%- include("partials/footer"); -%>
 
 <script>
-    // Get references to the input fields
     const numberOfMembersInput = document.querySelector('#numberOfMembers');
     const numberOfRoomsInput = document.querySelector('#numberOfRooms');
   
-    // Function to update the number of rooms occupied based on the number of members entered
     function updateNumberOfRooms() {
       const numberOfMembers = parseInt(numberOfMembersInput.value, 10);
       const numberOfRooms = numberOfMembers % 2 === 0 ? numberOfMembers / 2 : Math.floor(numberOfMembers / 2) + 1;
       numberOfRoomsInput.value = numberOfRooms;
     }
   
-    // Attach an event listener to the numberOfMembersInput to update the numberOfRoomsInput when the number of members changes
     numberOfMembersInput.addEventListener('input', updateNumberOfRooms);
   
-    // Call the updateNumberOfRooms function initially to set the value of numberOfRoomsInput
     updateNumberOfRooms();
   </script>

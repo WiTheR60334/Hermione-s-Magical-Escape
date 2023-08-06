@@ -8,7 +8,6 @@
             <% if(user && user.role === "user") { %>
                 <% if(user.googleId) { %>
                   <span id="text1" style="font-family:'Harry Potter Regular';font-weight:normal;" data-aos="fade-up" data-aos-delay="300">Welcome, <%= user.googleDisplayName %></span>
-
                 <% } else { %>
                   <span id="text1" data-aos="fade-up" data-aos-delay="300">Welcome, <%= user.name %></span>
                   <% } %>
@@ -164,8 +163,8 @@
                             <h3><i class="fas fa-map-marker-alt"></i><%= destination.title %></h3>
                         </div>
                         <div class="content">
-                            <div class="price">$ 999 <span>1499</span></div>
-                            <p><%= destination.firstPara %></p>
+                            <!-- <div class="price">$ 999 <span>1499</span></div> -->
+                            <p style="margin-top: -2rem;"><%= destination.firstPara %></p>
                             <a href="/alldestinations/<%= destination._id %>">Read More <i class="fas fa-angle-right"></i></a>
                         </div>
                 </div> 
@@ -239,9 +238,8 @@
 
 <section class="destination" id="destination">
     <div class="heading">
-        <span>Our Packages</span>
-        <h1>Explore the Mysterious Realms of Magic
-        </h1>
+        <span>Our Destinations</span>
+        <h1>Explore the Mysterious Realms of Magic</h1>
     </div>
 
     <div class="box-container">
@@ -253,8 +251,8 @@
               <h3><i class="fas fa-map-marker-alt"></i><%= destination.title %></h3>
             </div>
             <div class="content">
-              <div class="price">$ 999 <span>1499</span></div>   
-              <p><%= destination.firstPara %></p>
+              <!-- <div class="price">$ 999 <span>1499</span></div>    -->
+              <p style="margin-top: -2rem;"><%= destination.firstPara %></p>
               <a href="/alldestinations/<%= destination._id %>">Read More <i class="fas fa-angle-right"></i></a>
             </div>
           </div> 
@@ -271,14 +269,14 @@
     </section>
 
 <section class="pricing" id="pricing">
-    <h1 class="heading">Our Pricing
+    <h1 class="heading">Our Packages
     </h1>
     <div class="box-container">
         <div class="box" data-aos="fade-up" data-aos-delay="150">
             <h3>Basic Plan</h3>
             <div class="price">
                 <span>$</span>
-                <span class="amount">250</span>
+                <span class="amount">450</span>
                 <span>/mo</span>
             </div>
             <ul>
@@ -295,7 +293,7 @@
             <h3>Standard Plan</h3>
             <div class="price">
                 <span>$</span>
-                <span class="amount">365</span>
+                <span class="amount">750</span>
                 <span>/mo</span>
             </div>
             <ul>
@@ -312,7 +310,7 @@
             <h3>Premium Plan</h3>
             <div class="price">
                 <span>$</span>
-                <span class="amount">600</span>
+                <span class="amount"><950</span>
                 <span>/mo</span>
             </div>
             <ul>
