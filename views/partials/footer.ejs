@@ -56,47 +56,6 @@
   </div>
 </section>
 
-
-<!-- <section class="footer">
-    <div class="box-container">
-        <div class="box" data-aos="fade-up" data-aos-delay="100">
-            <a href="#" class="logo"> <i class="fas fa-paper-plane"></i>travel</a>
-            <p>para</p>
-            <div class="share">
-                <a href="#" class="fab fa-facebook-f"></a>
-                <a href="#" class="fab fa-twitter"></a>
-                <a href="#" class="fab fa-instagram"></a>
-                <a href="#" class="fab fa-linkedin"></a>
-            </div>
-        </div>
-
-        <div class="box" data-aos="fade-up" data-aos-delay="200">
-            <h3>quick links</h3>
-            <a href="/" class="links"><i class="fas fa-arrow-right"></i>home</a>
-            <a href="/about" class="links"><i class="fas fa-arrow-right"></i>about</a>
-            <a href="/alldestinations" class="links"><i class="fas fa-arrow-right"></i>destination</a>
-            <a href="/services" class="links"><i class="fas fa-arrow-right"></i>services</a>
-            <a href="/allflights" class="links"><i class="fas fa-arrow-right"></i>Flights</a>
-        </div>
-
-        <div class="box" data-aos="fade-up" data-aos-delay="300">
-            <p><i class="fas fa-map"></i> Ahmedabad, India</p>
-            <p><i class="fas fa-phone"></i> 7874030383</p>
-            <p><i class="fas fa-envelope"></i> HermioneMagicalEscape@gmail.com</p>
-            <p><i class="fas fa-clock"></i> 9:00am - 11:00pm</p>
-        </div>
-
-        <div class="box" data-aos="fade-up" data-aos-delay="400">
-            <h3>Newsletter</h3>
-            <p>Subscribe us for latest updates</p>
-            <form action="">
-                <input type="email" name="" placeholder="enter your email" class="email" id="">
-                <input type="submit" value="subscribe" class="btn">
-            </form>
-        </div>
-    </div>
-</section> -->
-
 <div class="credit">created by <span>Hermione's Magical Journeys</span> | all rights conserved</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
@@ -175,6 +134,7 @@
 // const bookFlightButton = document.querySelector('.book-flight');
 const roundTripRadio = document.getElementById('round-trip');
 const inputBox11 = document.querySelector('.inputBox11');
+const oneWayRadio = document.getElementById('one-way');
 
 function toggleInputBox11() {
   if (roundTripRadio.checked) {
@@ -185,8 +145,7 @@ function toggleInputBox11() {
 }
 
 function handleRadioClick(event) {
-  const clickedRadio = event.target;
-  if (clickedRadio !== roundTripRadio) {
+  if (event.target !== roundTripRadio) {
     inputBox11.style.display = 'none';
   }
 }
@@ -208,17 +167,13 @@ function handleRadioClick(event) {
 
 // multiCitiesRadio.addEventListener('click', toggleExtraSection);
 roundTripRadio.addEventListener('click', toggleInputBox11);
+oneWayRadio.addEventListener('click', handleRadioClick);
+
 
 
 // const radioButtons = document.querySelectorAll('.trip-details input[type="radio"]');
 // radioButtons.forEach(function(radioButton) {
 //   radioButton.addEventListener('click', handleRadioClick);
-
-  if (radioButton !== roundTripRadio) {
-    radioButton.addEventListener('click', function() {
-      inputBox11.style.display = 'none';
-    });
-  }
 // });
 
 // let cloneCounter = 1;
