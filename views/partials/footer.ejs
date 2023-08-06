@@ -31,12 +31,27 @@
       </div>
 
       <div class="box" data-aos="fade-up" data-aos-delay="400">
+        <% if(user && user.subscribed === "false") { %>
           <h3>Newsletter</h3>
           <p>Subscribe us for latest updates</p>
-          <form action="">
-              <input type="email" name="" placeholder="enter your email" class="email" id="">
+          <form action="/newsletter", method="post">
+              <input type="email"  placeholder="enter your email" name="email" class="email" id="">
               <input type="submit" value="subscribe" class="btn">
           </form>
+          <% } else if(user && user.subscribed === "true") { %>
+            <h3>You have subscribed to our newsletter through <%= user.subscribedemail %> email</h3>
+            <p>If you want to unsubscribe then you can unsubscribe below</p>
+            <form action="/newsletter/unsubscribe", method="post">
+              <input type="submit" value="Unsubscribe" class="btn">
+          </form>
+          <% } else { %>
+            <h3>Newsletter</h3>
+          <p>Subscribe us for latest updates</p>
+          <form action="/newsletter", method="post">
+              <input type="email"  placeholder="enter your email" name="email" class="email" id="">
+              <input type="submit" value="subscribe" class="btn">
+          </form>
+          <% } %>
       </div>
   </div>
 </section>

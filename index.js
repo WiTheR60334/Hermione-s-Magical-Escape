@@ -68,61 +68,68 @@ const destination1 = new Destination({
 // });
 
 const usersSchema = new mongoose.Schema({
-    name : String,
-    username: String,
-    password: String,
-    role: {
-      type: String,
-      default: "user"
+  name : String,
+  username: String,
+  password: String,
+  role: {
+    type: String,
+    default: "user"
+  },
+  subscribed: {
+    type: String,
+    enum: ['false', 'true'],
+    default: 'false',
+  },
+  subscribedemail : {
+    type : String
+  },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  }],
+  googleId: String,
+  googleDisplayName: String,
+  facebookId : String,
+  facebookDisplayName : String,
+  bookedFlights: [{
+    flight: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Flight',
     },
-    favorites: [{
+    destination : {
+      type : mongoose.Schema.Types.ObjectId,
+      ref : "Destination"
+    },
+    name: String,
+    mobile: String,
+    passportNumber: String,
+    email: String,
+    departure: String,
+    arrival: String,
+    departureDate: Date,
+    ticketPath : String
+  }],
+  bookedHotels: [{
+    hotel: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Post'
-    }],
-    googleId: String,
-    googleDisplayName: String,
-    facebookId : String,
-    facebookDisplayName : String,
-    bookedFlights: [{
-      flight: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Flight',
-      },
-      destination : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : "Destination"
-      },
-      name: String,
-      mobile: String,
-      passportNumber: String,
-      email: String,
-      departure: String,
-      arrival: String,
-      departureDate: Date,
-      ticketPath : String
-    }],
-    bookedHotels: [{
-      hotel: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Hotel',
-      },
-      hotelName: String,
-      checkInDate: Date,
-      checkOutDate: Date,
-      customerName: String,
-      numberOfMembers : Number,
-      occupiedRooms : Number,
-      mobile: String,
-      email: String,
-      passportNumber: String,
-      ticketPath: String,
-    }],
-    transactions: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Transaction',
-    }],
-  });
-  
+      ref: 'Hotel',
+    },
+    hotelName: String,
+    checkInDate: Date,
+    checkOutDate: Date,
+    customerName: String,
+    numberOfMembers : Number,
+    occupiedRooms : Number,
+    mobile: String,
+    email: String,
+    passportNumber: String,
+    ticketPath: String,
+  }],
+  transactions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Transaction',
+  }],
+});  
   usersSchema.plugin(passportLocalMongoose);
   
   const User = mongoose.model("User", usersSchema);
@@ -1316,7 +1323,7 @@ app.get("/allflights/:flightId/bookflight/paypal/success", isAuthenticated, asyn
 
     } else {
       console.log("No available seats for the selected flight");
-      res.redirect("/allflights/" + req.params.flightId);
+      res.redirect("/allflights");
     }
   } catch (err) {
     console.log(err);
@@ -2215,6 +2222,102 @@ app.post("/contact", function(req, res) {
       res.redirect("/"); // Redirect to homepage after successful submission
     }
   });
+});
+
+async function sendSubscribeEmail(userEmail) {
+  try {
+    // Create a Nodemailer transporter with your email service provider settings
+    const transporter = nodemailer.createTransport({
+      host : process.env.SMTP_HOST,
+      port : 587,
+      secure : false,
+      auth: {
+        user: process.env.user, // Replace with your Gmail email
+        pass: process.env.pass, // Replace with your Gmail password or an app password if enabled
+      },
+      tls : {
+        ciphers : "SSLv3"
+      }
+    });
+
+
+    // Define the email options
+    const mailOptions = {
+      from: process.env.user, // Replace with your Gmail email
+      to: userEmail, // Email address of the user
+      subject: "News Letter Subscription",
+      text: "Congratulations..! You have successfully subscribed to our News Letter. We are excited to share the latest thrilling news with you and keep you updated. Thanks for subscribing our new letter.",
+
+    };
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.log("Error sending email:", error);
+  }
+}
+
+
+app.post("/newsletter", isAuthenticated, function(req,res){
+  var email = req.body.email;
+  User.findByIdAndUpdate(req.user._id, { subscribed: 'true', subscribedemail : email }) // Update 'subscribed' to 'true'
+  .then((user) => {
+    console.log("Successfully subscribed to the newsletter");
+  })
+  .catch((err) => {
+    console.log("Error: " + err);
+  });
+  sendSubscribeEmail(email);
+  res.redirect("/");
+});
+
+async function sendUnsubscribeEmail(userEmail) {
+  try {
+    // Create a Nodemailer transporter with your email service provider settings
+    const transporter = nodemailer.createTransport({
+      host : process.env.SMTP_HOST,
+      port : 587,
+      secure : false,
+      auth: {
+        user: process.env.user, // Replace with your Gmail email
+        pass: process.env.pass, // Replace with your Gmail password or an app password if enabled
+      },
+      tls : {
+        ciphers : "SSLv3"
+      }
+    });
+
+
+    // Define the email options
+    const mailOptions = {
+      from: process.env.user, // Replace with your Gmail email
+      to: userEmail, // Email address of the user
+      subject: "Unscribe Hermione's News letter",
+      text: "You have successfully unsubscribed from the Hermione's News Letter. If you have any specific problems with our service please try contacting us at hermionemagicalescapes@gmail.com so that we can resolve your issue and improve our service. Thank You!",
+
+    };
+
+    // Send the email
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.log("Error sending email:", error);
+  }
+}
+
+
+app.post("/newsletter/unsubscribe", isAuthenticated, function(req,res){
+  const email = req.user.subscribedemail;
+  User.findByIdAndUpdate(req.user._id, { subscribed: 'false', subscribedemail : "" }) // Update 'subscribed' to 'true'
+  .then((user) => {
+    console.log("You have successfully Unsubscribed to our newsletter");
+  })
+  .catch((err) => {
+    console.log("Error: " + err);
+  });
+  sendUnsubscribeEmail(email);
+  res.redirect("/");
 });
 
 

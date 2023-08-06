@@ -4,7 +4,7 @@
   <div class="box-container">
     <div class="box">
   <h1>Add New Flight</h1>
-  <form action="/newflight" method="post">
+  <form action="/newflight" method="post" id="flightForm">
     <div class="form-group">
       <label for="flightID">Flight ID</label>
       <input type="text" class="form-control" id="flightID" name="flightID" required>
@@ -85,6 +85,7 @@
     <div class="form-group">
       <label for="price">Flight Price</label>
       <input type="number" class="form-control" id="price" name="price" required>
+      <p id="priceMessage" class="message"></p>
     </div>
     <div class="tp">
       <button type="submit" class="btn btn-primary">Add Flight</button>
@@ -93,5 +94,147 @@
   </div>
   </div>
 </section>
+
+<script>
+  function setFormattedDateToInputs2() {
+  const today = new Date();
+  const year = today.getFullYear();
+  let month = today.getMonth() + 1;
+  if (month < 10) {
+    month = '0' + month;
+  }
+  let day = today.getDate();
+  if (day < 10) {
+    day = '0' + day;
+  }
+  const formattedDate = `${year}-${month}-${day}`;
+
+  document.getElementById("departureDate").value = formattedDate;
+  document.getElementById("departureDate").min = formattedDate;
+
+  const nextDay = new Date(today);
+        nextDay.setDate(nextDay.getDate() + 1);
+
+        const nextYear = nextDay.getFullYear();
+        let nextMonth = nextDay.getMonth() + 1;
+        if (nextMonth < 10) {
+            nextMonth = '0' + nextMonth;
+        }
+        let nextDayOfMonth = nextDay.getDate();
+        if (nextDayOfMonth < 10) {
+            nextDayOfMonth = '0' + nextDayOfMonth;
+        }
+        const formattedNextDate = `${nextYear}-${nextMonth}-${nextDayOfMonth}`;
+
+        document.getElementById("arrivalDate").value = formattedNextDate;
+        document.getElementById("arrivalDate").min = formattedNextDate;
+      }
+      setFormattedDateToInputs2();
+
+      const departureDateInput = document.getElementById("departureDate");
+      const arrivalDateInput = document.getElementById("arrivalDate");
+    
+      departureDateInput.addEventListener("input", () => {
+        const departureDate = new Date(departureDateInput.value);
+        const nextDay = new Date(departureDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+    
+        const nextYear = nextDay.getFullYear();
+        let nextMonth = nextDay.getMonth() + 1;
+        if (nextMonth < 10) {
+          nextMonth = '0' + nextMonth;
+        }
+        let nextDayOfMonth = nextDay.getDate();
+        if (nextDayOfMonth < 10) {
+          nextDayOfMonth = '0' + nextDayOfMonth;
+        }
+        const formattedNextDate = `${nextYear}-${nextMonth}-${nextDayOfMonth}`;
+    
+        arrivalDateInput.min = formattedNextDate;
+      });
+</script>
+
+<script>
+  const maxCapacityInput = document.getElementById('maxCapacity');
+  const availableSeatsInput = document.getElementById('availableSeats');
+
+  maxCapacityInput.addEventListener('input', validateInput);
+  availableSeatsInput.addEventListener('input', validateInput);
+  priceInput.addEventListener('input', validateInput);
+
+  function validateInput() {
+    const maxCapacity = parseInt(maxCapacityInput.value) || 0;
+    const availableSeats = parseInt(availableSeatsInput.value) || 0;
+    // Validate non-negative values
+    if (maxCapacity < 0) {
+      maxCapacityInput.value = 0;
+    }
+    if (availableSeats < 0) {
+      availableSeatsInput.value = 0;
+    }
+
+    // Enforce maximum limit of 200
+    if (maxCapacity > 200) {
+      maxCapacityInput.value = 200;
+    }
+    if (availableSeats > 200) {
+      availableSeatsInput.value = 200;
+    }
+
+    // Ensure available seats are less than or equal to max capacity
+    if (availableSeats > maxCapacity) {
+      availableSeatsInput.value = maxCapacity;
+    }
+  }
+</script>
+
+<script>
+  const flightForm = document.getElementById("flightForm");
+  const priceInput = document.getElementById("price");
+  const priceMessage = document.getElementById("priceMessage");
+
+  function showMessage(message) {
+    priceMessage.textContent = message;
+  }
+
+  function hideMessage() {
+    priceMessage.textContent = "";
+  }
+
+  function validatePrice() {
+    const priceValue = parseInt(priceInput.value);
+
+    if (isNaN(priceValue) || priceValue < 0) {
+      showMessage("Price cannot be negative.");
+      return false;
+    } else if (priceValue < 15) {
+      showMessage("Minimum price limit is 15.");
+      return false;
+    } else if (priceValue > 1000) {
+      showMessage("Maximum price limit is 1000.");
+      return false;
+    } else {
+      hideMessage();
+      return true;
+    }
+  }
+
+  priceInput.addEventListener("input", () => {
+    if (priceInput.value.trim() === "") {
+      hideMessage();
+    } else {
+      validatePrice();
+    }
+  });
+
+  flightForm.addEventListener("submit", (event) => {
+    if (!validatePrice()) {
+      event.preventDefault();
+    }
+    // Add validation for other form fields if required
+  });
+</script>
+
+
 
 <%- include("partials/footer"); -%>

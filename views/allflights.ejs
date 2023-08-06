@@ -132,6 +132,54 @@
               </div>
           </div>
 
+          <script>
+            function setFormattedDateToInputs1() {
+            const today = new Date();
+            const year = today.getFullYear();
+            let month = today.getMonth() + 1;
+            if (month < 10) {
+              month = '0' + month;
+            }
+            let day = today.getDate();
+            if (day < 10) {
+              day = '0' + day;
+            }
+            const formattedDate1 = `${year}-${month}-${day}`;
+          
+            document.getElementById("calendar").value = formattedDate1;
+            document.getElementById("calendar").min = formattedDate1;
+          
+            const nextDay = new Date(today);
+                  nextDay.setDate(nextDay.getDate() + 1);
+          
+                  const nextYear = nextDay.getFullYear();
+                  let nextMonth = nextDay.getMonth() + 1;
+                  if (nextMonth < 10) {
+                      nextMonth = '0' + nextMonth;
+                  }
+                  let nextDayOfMonth = nextDay.getDate();
+                  if (nextDayOfMonth < 10) {
+                      nextDayOfMonth = '0' + nextDayOfMonth;
+                  }
+                  const formattedNextDate2 = `${nextYear}-${nextMonth}-${nextDayOfMonth}`;
+          
+                  document.getElementById("calendar2").value = formattedNextDate2;
+                  document.getElementById("calendar2").min = formattedNextDate2;
+                }
+          
+          
+          
+            // Target the second date input using querySelector
+            // const calendarInput = document.querySelector(".login .box-container .box .inputBox input[type='date']");
+            // if (calendarInput) {
+            //   calendarInput.value = formattedDate;
+            // }
+          
+          
+          setFormattedDateToInputs1();
+
+          </script>
+
           <!-- <div class="extra-section">
               <div class="place">
                   <div class="inputBox">

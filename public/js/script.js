@@ -1,16 +1,48 @@
-const today = new Date();
-  
-const year = today.getFullYear();
-let month = today.getMonth() + 1;
-if (month < 10) {
-  month = '0' + month;
-}
-let day = today.getDate();
-if (day < 10) {
-  day = '0' + day;
-}
-const formattedDate = `${year}-${month}-${day}`;
-document.getElementById("calendar").value = formattedDate;
+function setFormattedDateToInputs() {
+  const today = new Date();
+  const year = today.getFullYear();
+  let month = today.getMonth() + 1;
+  if (month < 10) {
+    month = '0' + month;
+  }
+  let day = today.getDate();
+  if (day < 10) {
+    day = '0' + day;
+  }
+  const formattedDate = `${year}-${month}-${day}`;
+
+  document.getElementById("date1").value = formattedDate;
+  document.getElementById("date1").min = formattedDate;
+
+  const nextDay = new Date(today);
+        nextDay.setDate(nextDay.getDate() + 1);
+
+        const nextYear = nextDay.getFullYear();
+        let nextMonth = nextDay.getMonth() + 1;
+        if (nextMonth < 10) {
+            nextMonth = '0' + nextMonth;
+        }
+        let nextDayOfMonth = nextDay.getDate();
+        if (nextDayOfMonth < 10) {
+            nextDayOfMonth = '0' + nextDayOfMonth;
+        }
+        const formattedNextDate = `${nextYear}-${nextMonth}-${nextDayOfMonth}`;
+
+        document.getElementById("date2").value = formattedNextDate;
+        document.getElementById("date2").min = formattedNextDate;
+      }
+
+
+
+  // Target the second date input using querySelector
+  // const calendarInput = document.querySelector(".login .box-container .box .inputBox input[type='date']");
+  // if (calendarInput) {
+  //   calendarInput.value = formattedDate;
+  // }
+
+
+setFormattedDateToInputs();
+
 
 
 

@@ -96,11 +96,12 @@
 
 
 <section class="fl-hotel">
-    <form action="/allflights/home/search" method="post">
+    
 
     <div class="icons3">
         <input data-aos="zoom-in" data-aos-delay="100" type="submit" value="flights" class="btnn">
         <!-- <input data-aos="zoom-in" data-aos-delay="200" type="submit" value="hotels" class="btnn2"> -->
+        <form action="/allflights/home/search" method="post">
         <div class="links">
             <p  data-aos="fade-up" data-aos-delay="100" id="link1" name="tripType" value="one-way">One Way</p>
             <p  data-aos="fade-up" data-aos-delay="200" id="link2" name="tripType" value="round-trip">Round Trip</p>     
@@ -112,7 +113,7 @@
             <div class="box">
                 <span>From :</span>
                 <div id="plane1" class="fas fa-plane-departure"></div><br>
-            <select  name="departure" id="from-select">
+            <select  name="departure" id="from-select" required>
                 <option value="" disabled selected>Select a state</option>
             <option value="Andhra Pradesh">Andhra Pradesh</option>
             <option value="Arunachal Pradesh">Arunachal Pradesh</option>
@@ -149,7 +150,7 @@
             <div class="box">
                 <span>Where :</span>
                 <div id="plane1" class="fas fa-plane-arrival"></div><br>
-                <select  name="arrival" id="from-select">
+                <select  name="arrival" id="from-select" required>
                     <option value="" disabled selected>Select the place</option>
                     <% destinations.forEach(function(destination){ %>
                     <option value="Hogwarts Castle"><%- destination.title %></option>
@@ -161,11 +162,11 @@
             <div class="box">
                 <div class="journey">
                     <span>Journey Date</span><br>
-                    <input type="date" id="date1" name="departureDate" value="">    
+                    <input type="date" id="date1" name="departureDate" value="" required>    
                 </div>
                 <div class="return">
                     <span>Return Date</span><br>
-                    <input type="date" id="date1" name="returnDate" value="">    
+                    <input type="date" id="date2" name="returnDate" value="">    
                 </div>
             </div>
         </div>

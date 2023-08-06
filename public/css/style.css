@@ -2530,6 +2530,11 @@ background: var(--bordercolor);
     margin-bottom: 2rem;
   }
 }
+.message{
+  font-size: 1.5rem;
+  color: red;
+  font-weight: bold;
+}
 .new-hotel .tp{
   align-items: center;
   justify-content: center;
@@ -3688,6 +3693,7 @@ input.form-control {
   font-size: 1.5rem;
   padding: 1rem 2rem;
   color: var(--textcolor1);
+  margin-left: 3rem;
 }
 .btnn2{
   margin-left: 2rem;
@@ -3770,9 +3776,9 @@ input.form-control {
   display: flex;
   flex-wrap: wrap;
   margin-top: -3.5rem;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
-
+#date2,
 #date1{
   margin-top: 2.75rem;
   margin-left: 1.7rem;
