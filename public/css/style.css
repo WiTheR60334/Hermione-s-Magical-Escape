@@ -3934,7 +3934,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 
 
-@media (min-width: 1366px) and (max-width:1366px) {
+@media (min-width: 1920px) and (max-width:1920px) {
   .fl-hotel{
     width: 87%;
   }
