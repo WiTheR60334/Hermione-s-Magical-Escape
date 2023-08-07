@@ -158,6 +158,7 @@
 
   </div>
 </section>
+<div class="space" style="margin-top: 20rem;"></div>
 
 <%- include("partials/footer"); -%>
 
@@ -189,3 +190,64 @@
     }
   
   </script>
+
+<script>
+  function setFormattedDateToInputs1() {
+    const today = new Date();
+    const year = today.getFullYear();
+    let month = today.getMonth() + 1;
+    if (month < 10) {
+      month = '0' + month;
+    }
+    let day = today.getDate();
+    if (day < 10) {
+      day = '0' + day;
+    }
+    const formattedDate1 = `${year}-${month}-${day}`;
+  
+    document.getElementById("calendar").value = formattedDate1;
+    document.getElementById("calendar").min = formattedDate1;
+  
+    const nextDay = new Date(today);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    const nextYear = nextDay.getFullYear();
+    let nextMonth = nextDay.getMonth() + 1;
+    if (nextMonth < 10) {
+        nextMonth = '0' + nextMonth;
+    }
+    let nextDayOfMonth = nextDay.getDate();
+    if (nextDayOfMonth < 10) {
+        nextDayOfMonth = '0' + nextDayOfMonth;
+    }
+    const formattedNextDate2 = `${nextYear}-${nextMonth}-${nextDayOfMonth}`;
+
+    document.getElementById("calendar2").value = formattedNextDate2;
+    document.getElementById("calendar2").min = formattedNextDate2;
+  }
+  
+  setFormattedDateToInputs1();
+  const departureDateInput = document.getElementById("calendar");
+  const arrivalDateInput = document.getElementById("calendar2");
+  
+  departureDateInput.addEventListener("input", () => {
+    const departureDate = new Date(departureDateInput.value);
+    const nextDay = new Date(departureDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+  
+    const nextYear = nextDay.getFullYear();
+    let nextMonth = nextDay.getMonth() + 1;
+    if (nextMonth < 10) {
+      nextMonth = '0' + nextMonth;
+    }
+    let nextDayOfMonth = nextDay.getDate();
+    if (nextDayOfMonth < 10) {
+      nextDayOfMonth = '0' + nextDayOfMonth;
+    }
+    const formattedNextDate = `${nextYear}-${nextMonth}-${nextDayOfMonth}`;
+  
+    arrivalDateInput.min = formattedNextDate;
+  });
+
+</script>
+
