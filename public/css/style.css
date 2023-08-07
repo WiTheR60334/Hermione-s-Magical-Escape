@@ -3934,6 +3934,70 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 
 
+@media (min-width: 1366px) and (max-width:1366px) {
+  .fl-hotel{
+    width: 87%;
+  }
+  .fl-hotel .box{
+    margin-top: 5rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    width: 100%;
+    background: var(--bgcolor1);
+    padding: 1.5rem;
+    position: relative;
+  }
+  .fl-hotel .box span{
+    color: var(--bordercolor);
+    font-size: 1.5rem;
+    margin-left: 2rem;
+    margin-top: 1.5rem;
+  }
+  
+  .fl-hotel .box #from-select{
+    margin-left: 1.6rem;
+    margin-top: 3.3rem;
+    font-size: 1.5rem;
+    background: none;
+    color: var(--bordercolor);
+  }
+  #plane1{
+    position: fixed;
+    right: 2rem;
+    font-size: 1.5rem;
+    color: var(--bordercolor);
+  }
+  #date2,
+  #date1{
+    margin-top: 2.9rem;
+    /* margin-left: 1.7rem; */
+    background: none;
+    color: var(--bordercolor);
+    font-size: 1.6rem;
+  }
+  .passengers p{
+    font-size: 2.2rem;
+    color: var(--bordercolor);
+    margin-left: 2rem;
+    margin-top: .5rem;
+    margin-bottom: -.5rem;
+  }
+  .dropdown1{
+    position: absolute;
+    top: 125%;
+    right: 4.5%;
+    z-index: 999;
+    /* display: flex; */
+    flex-direction: column;
+    background: var(--bgcolor2);
+    border-radius: 1rem;
+    width: 25rem;
+    transform-origin: top right;
+    /* border: .1rem solid var(--orange); */
+  }
+}
+
+
 /* Mobile styles */
 @media (max-width: 768px) {
   .fl-hotel {
