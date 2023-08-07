@@ -3009,7 +3009,7 @@ background: var(--bordercolor);
 }
 
 .banner {
-  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.7)), url("../images/home-bg2.jpg") no-repeat;
+  background: linear-gradient(rgba(17, 17, 17, 0.7), rgba(17, 17, 17, 0.2)), url("../images/banner4.jpg") no-repeat;
   /* filter: brightness(200%); */
   background-size: cover;
   background-position: center;
