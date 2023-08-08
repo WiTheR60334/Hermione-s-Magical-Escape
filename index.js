@@ -323,7 +323,7 @@ const scheduleSchema = new mongoose.Schema({
       required: true,
     },
     pricePerNight: {
-      type: String,
+      type: Number,
       required: true,
     },
     rating: {
