@@ -144,6 +144,59 @@
         <p class="cabinOption cabinOption3">First Class</p>
     </div>    
   </div>
+
+  <% if(user && user.role === "admin") { %>
+
+    <section class="container2">
+      <h1 style="font-size: 4rem; margin-bottom:30px;margin-top: 3rem;">Dashboard</h1>
+      </section>
+
+    <section class="scheduled-flights">
+        <div class="flight-card1">
+          <div class="info" style="margin: 1rem;">
+            <p style="font-size: 1.6rem;">Total Flight Revenue: </p>
+            <h2 style="margin-top: 1rem;">$<%= totalFlightRevenue %></h2>
+          </div>
+          <div class="next-line" style="margin-top: 1.5rem;">
+            <img src="../images/arrow-1.png" alt="">  
+          </div>
+        </div>
+
+        <div class="flight-card1">
+          <div class="info" style="margin: 1rem;">
+            <p style="font-size: 1.6rem;">Net Flight Profit: </p>
+            <h2 style="margin-top: 1rem;">$<%= totalFlightProfit %></h2>
+          </div>
+          <div class="next-line" style="margin-top: 1.5rem;">
+            <img src="../images/arrow-2.png" alt="">  
+          </div>
+        </div>
+
+        <div class="flight-card1">
+          <div class="info" style="margin: 1rem;">
+            <p style="font-size: 1.6rem;">Total Hotel Revenue: </p>
+            <h2 style="margin-top: 1rem;">$<%= totalHotelRevenue %></h2>
+          </div>
+          <div class="next-line" style="margin-top: 1.5rem;">
+            <img src="../images/arrow-3.png" alt="">  
+          </div>
+        </div>
+
+        <div class="flight-card1">
+          <div class="info" style="margin: 1rem;">
+            <p style="font-size: 1.6rem;">Net Hotel Profit: </p>   
+            <h2 style="margin-top: 1rem;">$<%= totalHotelProfit %></h2>   
+          </div>
+          <div class="next-line" style="margin-top: 1.5rem;">
+            <img src="../images/arrow-4.png" alt="">  
+          </div>
+        </div>
+
+
+   </section>
+  
+<% } %>
+  
   
 <% if(user && user.role==="user" && user.bookedFlights && user.bookedFlights.length > 0 && destination !== null && user.bookedFlights[0].arrival){ %>
     <section class="tp">

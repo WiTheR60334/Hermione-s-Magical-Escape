@@ -2028,6 +2028,24 @@ background: var(--bordercolor);
   padding: 1.2rem 1.4rem;
 }
 
+.scheduled-flights .flight-card1{
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--bgcolor2);
+  color: var(--textcolor1);
+  display: flex;
+  text-align: center;
+  padding: 1.2rem 1.4rem;
+}
+
+.scheduled-flights .flight-card1 h2{
+  font-size: 3rem;
+}
+
+.flight-card1 .info p{
+  color: var(--textcolor1);
+}
+
 .scheduled-flights .flight-card h2{
   font-size: 2.1rem;
 }

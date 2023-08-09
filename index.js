@@ -471,25 +471,71 @@ app.get("/", async function(req, res) {
       if (req.user && req.user.role === "user") {
         if(req.user.bookedFlights.length>0){
           const destination = req.user.bookedFlights[0].arrival;
-          // console.log(destination)
           if (destination !== null) {
               finalDestination = await Destination.findOne({ title: destination }).exec();
           }
         }
       }
 
-      if (finalDestination !== null) {
-        res.render("home", { destinations: foundDestinations, user: req.user, destination: finalDestination, hotels : foundHotels });
-    } else {
-        res.render("home", { destinations: foundDestinations, user: req.user, hotels : foundHotels });
-    }
+  
+  
+      // Retrieve all users from the database and populate bookedFlights and bookedHotels
+      const allusers = await User.find({}).exec();
+  
+      // Calculate total flight profit
+      var totalFlightProfit = 0;
+      var totalFlightRevenue = 0;
 
-      // console.log(finalDestination);
-  } catch (err) {
-      console.log(err);
-      res.status(500).send("Internal Server Error");
-  }
-});
+      var totalHotelProfit = 0;
+      var totalHotelRevenue = 0;
+
+      for (const user of allusers) {
+        for (const booking of user.bookedFlights) {
+          const flight = booking.flight;
+          try {
+            const newFlight = await Flight.findOne({ _id: flight });
+            if (newFlight && newFlight.price) {
+              totalFlightProfit += newFlight.price*0.1;
+              totalFlightRevenue += newFlight.price;
+
+            }
+          } catch (err) {
+            console.log("Error occurred:", err);
+          }
+        }
+      }
+  
+      // Calculate total hotel profit
+      // Calculate total hotel profit
+      for (const user of allusers) {
+        for (const booking of user.bookedHotels) {
+          const hotel = booking.hotel;
+          try {
+            const newHotel = await Hotel.findOne({ _id: hotel });
+            if (newHotel && newHotel.pricePerNight) {
+              totalHotelProfit += newHotel.pricePerNight*0.1;
+              totalHotelRevenue += newHotel.pricePerNight;
+            }
+          } catch (err) {
+            console.log("Error occurred:", err);
+          }
+        }
+      }
+      totalFlightProfit = Math.round(totalFlightProfit);
+      totalHotelProfit = Math.round(totalHotelProfit);
+        if (finalDestination !== null) {
+          res.render("home", { destinations: foundDestinations, user: req.user, destination: finalDestination, hotels : foundHotels, totalHotelProfit : totalHotelProfit, totalFlightProfit: totalFlightProfit, totalHotelRevenue: totalHotelRevenue, totalFlightRevenue: totalFlightRevenue });
+      } else {
+          res.render("home", { destinations: foundDestinations, user: req.user, hotels : foundHotels, totalHotelProfit : totalHotelProfit, totalFlightProfit: totalFlightProfit, totalHotelRevenue: totalHotelRevenue, totalFlightRevenue: totalFlightRevenue});
+      }
+  
+        // console.log(finalDestination);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal Server Error");
+    }
+  });
+
 
 
 app.post("/allflights/home/search", async function(req, res) {
@@ -2319,7 +2365,6 @@ app.post("/newsletter/unsubscribe", isAuthenticated, function(req,res){
   sendUnsubscribeEmail(email);
   res.redirect("/");
 });
-
 
 const port = process.env.PORT || 3000;
 
