@@ -3766,6 +3766,7 @@ input.form-control {
   padding: 1.5rem;
   position: relative;
   display: flex;
+  padding: 1.2rem 1.4rem;
 }
 .fl-hotel .box{
   margin-top: 5rem;
@@ -3773,7 +3774,7 @@ input.form-control {
   overflow: hidden;
   width: 100%;
   background: var(--bgcolor1);
-  padding: 1.5rem;
+  padding: 1.2rem 1.4rem;
   position: relative;
 }
 .fl-hotel .box span{
@@ -4054,7 +4055,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 8.5rem;
 }
 
-
+/* @media (min-width: 1920px) {
   .fl-hotel{
     width: 87%;
   }
