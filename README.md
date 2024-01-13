@@ -50,5 +50,5 @@ Experience seamless and secure transactions with real online PayPal payments. Yo
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/harry-potter-travel.git
-   cd harry-potter-travel
+   git clone https://github.com/WiTheR60334/Hermione-s-Magical-Escape.git
+   cd Hermione-s-Magical-Escape
